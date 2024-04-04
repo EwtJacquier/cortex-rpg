@@ -22,11 +22,11 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
-        <script src="/js/cannon.min.js"></script>
-        <script src="/js/three.min.js"></script>
-        <script src="/js/teal.js"></script>
-        <script src="/js/dice.js"></script>
-        <script src="/js/dice_custom.js"></script>
+        <script src="/js/cannon.min.js" async></script>
+        <script src="/js/three.min.js" async></script>
+        <script src="/js/teal.js" async></script>
+        <script src="/js/dice.js" async></script>
+        <script src="/js/dice_custom.js" async></script>
       </head>
       <body className={montserrat.variable}>
         <AppRouterCacheProvider>
