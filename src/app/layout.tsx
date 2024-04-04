@@ -6,6 +6,7 @@ import { AppProvider } from '../context/app-context';
 import { Montserrat, Saira_Condensed } from 'next/font/google';
 import theme from './theme';
 import './globals.css'
+import Script from 'next/script';
 
 const montserrat = Saira_Condensed({
   subsets: ['latin'],
@@ -22,11 +23,11 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
-        <script src="/js/cannon.min.js" async></script>
-        <script src="/js/three.min.js" async></script>
-        <script src="/js/teal.js" async></script>
-        <script src="/js/dice.js" async></script>
-        <script src="/js/dice_custom.js" async></script>
+        <Script src="/js/cannon.min.js" strategy='beforeInteractive'/>
+        <Script src="/js/three.min.js" strategy='beforeInteractive'/>
+        <Script src="/js/teal.js" strategy='beforeInteractive'/>
+        <Script src="/js/dice.js" strategy='beforeInteractive'/>
+        <Script src="/js/dice_custom.js" strategy='beforeInteractive'/>
       </head>
       <body className={montserrat.variable}>
         <AppRouterCacheProvider>
