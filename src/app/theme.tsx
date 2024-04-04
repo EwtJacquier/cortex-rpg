@@ -19,7 +19,7 @@ declare module "@mui/material/styles" {
 
 const theme = createTheme({
   typography: {
-    fontFamily: "'Montserrat', sans-serif",
+    fontFamily: "var(--font-montserrat), sans-serif",
     h1: {
       fontWeight: 600,
       fontSize: '2.2rem'
@@ -53,17 +53,17 @@ const theme = createTheme({
       secondary: '#878787'
     },
     primary: {
-      "50": "#EFF8FF",
-      "100": "#D1E9FF",
-      "200": "#B2DDFF",
-      "300": "#84CAFF",
-      "400": "#53B1FD",
-      "500": "#2E90FA",
-      "600": "#1570EF",
-      "700": "#175CD3",
-      "800": "#1849A9",
-      "900": "#194185",
-      main: '#1570EF', // Same as 600
+      "50": "#202225",
+      "100": "#202225",
+      "200": "#202225",
+      "300": "#202225",
+      "400": "#202225",
+      "500": "#202225",
+      "600": "#202225",
+      "700": "#202225",
+      "800": "#202225",
+      "900": "#202225",
+      main: '#202225', // Same as 600
     },
     secondary: {
       "50": "#F9FAFB",
