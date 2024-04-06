@@ -251,7 +251,7 @@ const SaModal = (props: saModalProps) => {
           {action: () => {def(token.slug)}, text: 'Defender-se'},
         ]
 
-        if (userCurrentToken.position != token.position){
+        if (userTokenData.position != token.position){
           menuOptions.push({action: () => {atk(token.slug, 'ranged')}, text: 'À Distância'})
         }
         else{
