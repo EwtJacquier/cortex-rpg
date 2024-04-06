@@ -29,7 +29,7 @@ const FormLogin = () => {
 
       (async() => {
         login(email, password).then((response) => {
-          router.push('/home')
+          //router.push('/home')
         }).catch((error) => {
           setErrorMessage('Usuário ou senha inválidos')
           setIsLoading(false)
