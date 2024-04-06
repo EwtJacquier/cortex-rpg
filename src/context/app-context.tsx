@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, child, get, onValue, DatabaseReference, set, Database, update, onChildAdded, runTransaction  } from "firebase/database";
 import { Auth, User, UserCredential, getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import * as BdMask from "../helpers/mask"
 
 interface AppProps {
   gameData?: any,
@@ -17,12 +18,15 @@ interface AppProps {
   login?: (user: string, password: string) => Promise<UserCredential | boolean>;
   updateToken?: (data: userModel, token?: string) => void;
   updateCurrentMap?: (map: string, scene: string) => void;
-  sendMessage?: (message: string) => void;
+  sendMessage?: (token: any, message: string, dices: any, result: any) => void;
+  changeCurrentToken?: (token: string) => void,
+  isSheetOpen?: boolean,
+  setIsSheetOpen?: (open: boolean) => void,
 }
 
 const AppContext = createContext<AppProps>({});
 
-type userModel = {
+export type userModel = {
   name?: string,
   class?: string,
   level?: number,
@@ -41,7 +45,10 @@ type userModel = {
     body?: string,
     mind?: string,
   },
-  comp?: string,
+  complications?: string[],
+  habilities?: string[],
+  distinctions?: string[],
+  equips?: string[],
   position?: number,
   scene?: string,
 }
@@ -58,24 +65,28 @@ export const AppProvider = ({children}: any) => {
   const tokensRef = useRef<DatabaseReference>() 
   const chatRef = useRef<DatabaseReference>() 
   
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [gameData, setGameData] = useState<any>()
   const [users, setUsers] = useState<any>()
   const [tokens, setTokens] = useState<any>()
-  const [messages, setMessages] = useState<object[]>([])
+  const [messages, setMessages] = useState<any[]>([])
   const [user, setUser] = useState<User | null>()
   const [userData, setUserData] = useState<any>()
   const [userTokenData, setUserTokenData] = useState<any>()
   const [userTokens, setUserTokens] = useState<any>()
   const [userCurrentToken, setUserCurrentToken] = useState<any>()
+  const [newMessage, setNewMessage] = useState<any>()
   const [windowSize, setWindowSize] = useState({
     width: 0,
     height: 0,
   });
 
-
   useEffect(() => {
+    if (newMessage){
+      setMessages([...messages, newMessage])
+    }
+  },[newMessage])
 
-  }, tokens)
 
   useEffect(() => {
     const firebaseConfig = {
@@ -94,7 +105,11 @@ export const AppProvider = ({children}: any) => {
     onAuthStateChanged(auth.current, (user) => {
       if (user) {
         onChildAdded(chatRef.current, (data) => {
-          setMessages([messages, ...[data]])
+          data = data.val()
+
+          if (data){
+            setNewMessage(data)
+          }
         });
     
         const updateGameData = (data: any) => {
@@ -208,26 +223,42 @@ export const AppProvider = ({children}: any) => {
   }
 
   const updateToken = (data: userModel, token?: string) => {
-    console.log('aqui')
     if (database.current && userCurrentToken && userData){
       update(ref(database.current, 'tokens/' + (userData.type === 'gm' && token ? token : userCurrentToken)), data);
     }
   }
 
-  const sendMessage = (message: string) => {
-    if (userData && user && users && database.current){
+  const sendMessage = (token: any, message: string, dices: any, result: any) => {
+    if (userData && user && users && database.current && message && token){
+      
+
       try{
         const time = new Date().getTime()
         const username = userData.name
-  
-        set(ref(database.current, 'chat/' + time), {
+
+        let obj: any = {
           message: message,
           author: user.uid,
+          token: token,
+          result: result,
+          date: BdMask.maskDate(new Date(), true),
           name: username
-        });
-      }
-      catch{
+        }
 
+        if (dices){
+          obj.dices = {
+            d4: dices.d4,
+            d6: dices.d6,
+            d8: dices.d8,
+            d10: dices.d10,
+            d12: dices.d12,
+          }
+        }
+
+        set(ref(database.current, 'chat/' + time), obj);
+      }
+      catch(e){
+        console.log(e)
       }
       
     }    
@@ -256,6 +287,11 @@ export const AppProvider = ({children}: any) => {
     }
   }
 
+  const changeCurrentToken = (token: string) => {
+    setUserCurrentToken(token)
+    setUserTokenData(tokens[token])
+  }
+
   const value = {
     gameData,
     users,
@@ -270,7 +306,10 @@ export const AppProvider = ({children}: any) => {
     login,
     updateToken,
     updateCurrentMap,
-    sendMessage
+    sendMessage,
+    changeCurrentToken,
+    isSheetOpen,
+    setIsSheetOpen
   };
 
   return (

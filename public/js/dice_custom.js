@@ -38,13 +38,13 @@ function dice_initialize(container) {
 
     $t.dice.use_true_random = false;
 
-    dbox = new $t.dice.dice_box(canvas, { w: 700, h: 700 });
+    dbox = new $t.dice.dice_box(canvas, { w: 1000, h: 700 });
     dbox.animate_selector = false;
 
     $t.bind(window, 'resize', function() {
         canvas.style.width = window.innerWidth - 1 + 'px';
         canvas.style.height = window.innerHeight - 1 + 'px';
-        dbox.reinit(canvas, { w: 700, h: 700 });
+        dbox.reinit(canvas, { w: 1000, h: 700 });
     });
 
     function before_roll(vectors, notation, callback) {

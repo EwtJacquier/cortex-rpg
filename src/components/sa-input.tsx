@@ -2,7 +2,7 @@
 
 import { validatorResponse } from '@/helpers/validation';
 import { TextField, Box, MenuItem } from '@mui/material';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import SaIcon from './sa-icon';
 import theme from '@/app/theme';
 
@@ -15,6 +15,7 @@ type saInputProps = {
   autoComplete?: string,
   icon?: string,
   value?: string,
+  name?: string,
   size?: 'small' | 'medium',
   gray?: boolean,
   getValue?: (text: string) => void,
@@ -26,6 +27,7 @@ type saInputProps = {
 const SaInput = (props: saInputProps) => {
   const [showPassword, setShowPassword] = useState(false)
   const [currentError, setErrorMessage] = useState('')
+  const inputRef = useRef<any>()
 
   const onChangeText = (e: any) => {
     const text = e.target.value;
@@ -70,13 +72,29 @@ const SaInput = (props: saInputProps) => {
   let inputPropsObject: {
     placeholder?: string,
     startAdornment?: any,
-    endAdornment?: any
+    endAdornment?: any,
   } = {}
+
+  useEffect(() => {
+    /*
+    if (inputRef.current.node){
+      console.log(props.value,inputRef.current.node);
+      inputRef.current.node.value = props.value
+    }
+    else{
+      inputRef.current.value = props.value
+    }
+    */
+  },[])
 
   let labelStyle = {}
 
   if (props.placeholder){
     inputPropsObject['placeholder'] = props.placeholder
+  }
+
+  if (props.readonly){
+    inputPropsObject['readOnly'] = props.readonly
   }
 
   if (props.icon){
@@ -134,13 +152,14 @@ const SaInput = (props: saInputProps) => {
       <TextField
         fullWidth={true}
         select={props.select}
+        name={props.name}
         size={props.size ? props.size : 'medium'}
         label={props.label}
         type={props.type === 'password' && showPassword ? 'text' : props.type}
         autoComplete={props.autoComplete}
         helperText={currentError}
         variant="outlined"
-        defaultValue={props.value && !props.select ? props.value : ''}
+        defaultValue={props.value ? props.value : ''}
         onKeyUp={onChangeText}
         onChange={onChangeText}
         color={currentError ? 'error' : 'primary'}
@@ -154,12 +173,14 @@ const SaInput = (props: saInputProps) => {
         }
         InputProps={{
           style: {...styles.input, ...grayStyle},
+          inputRef: inputRef,
           ...inputPropsObject
         }}
         SelectProps={{
           style: {...styles.input, ...grayStyle},
-          value: props.value,
           IconComponent: (props) => { return ( <SaIcon name='chevron-down' style={{marginTop: 0, marginRight: '5px'}} {...props}/> ) },
+          ref: inputRef,
+          defaultValue: props.value ? props.value : '',
           ...inputPropsObject
         }}
         InputLabelProps={{

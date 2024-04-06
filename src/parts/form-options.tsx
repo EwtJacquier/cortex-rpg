@@ -8,8 +8,12 @@ import SaButton from '@/components/sa-button';
 import SaMessage from '@/components/sa-message';
 import { useApp } from '@/context/app-context';
 
-const FormOptions = () => {
-  const {gameData, updateCurrentMap} = useApp()
+type FormProps = {
+  afterSave: () => void
+}
+
+const FormOptions = (props: FormProps) => {
+  const {gameData, updateCurrentMap, userData, changeCurrentToken, userCurrentToken, tokens} = useApp()
 
   const [currentMap, setCurrentMap] = useState('')
   const [currentScene, setCurrentScene] = useState('')
@@ -29,6 +33,8 @@ const FormOptions = () => {
 
     if (updateCurrentMap){
       updateCurrentMap(currentMap, currentScene)
+
+      props.afterSave()
     }
 
     setIsLoading(false)

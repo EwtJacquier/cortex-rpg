@@ -34,6 +34,7 @@ const SaButton = (props: saButtonProps) => {
       color={props.theme}
       disableElevation={true}
       onClick={props.onClick}
+      type='submit'
       sx={{
         ...styles.button,
         padding: `${paddingVertical}px 18px`,

@@ -7,7 +7,10 @@ export const metadata: Metadata = {
 };
 
 const Home = () => {
-  return <HomeContent/>
+  return <>
+    <button id='roll' style={{zIndex: -2, position: 'absolute', opacity: 0}}></button>
+    <HomeContent/>
+  </>
 }
 
 export default Home;
