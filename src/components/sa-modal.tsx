@@ -249,9 +249,14 @@ const SaModal = (props: saModalProps) => {
       if (token.slug !== userCurrentToken && token.type !== userTokenData.type){
         menuOptions = [
           {action: () => {def(token.slug)}, text: 'Defender-se'},
-          {action: () => {atk(token.slug, 'close')}, text: 'Corpo a corpo'},
-          {action: () => {atk(token.slug, 'ranged')}, text: 'À Distância'},
         ]
+
+        if (userCurrentToken.position != token.position){
+          menuOptions.push({action: () => {atk(token.slug, 'ranged')}, text: 'À Distância'})
+        }
+        else{
+          menuOptions.push({action: () => {atk(token.slug, 'close')}, text: 'Corpo a corpo'})
+        }
       }
     }
     
