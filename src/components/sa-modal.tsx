@@ -270,16 +270,8 @@ const SaModal = (props: saModalProps) => {
 
     return (
       <Box width={width ? width : '15%'} sx={[{aspectRatio: '1/1', zIndex: activeTokenMenu === token.slug ? 10 : 1 , ...styles.cardContainer}, width !== '' ? styles.cardNormal : {}]} key={index+'t'} onContextMenu={(event) => {event.preventDefault(); setActiveTokenMenu(token.slug)}} onClick={(event) => {event.stopPropagation()}}>
-        <Box width={'100%'} height='100%' sx={[styles.card, width !== '' ? styles.cardNormal : {}, token.slug === userCurrentToken ? styles.cardSelected : {}]}>
-          <Box position={'absolute'} display={'flex'} flexDirection={'column'} justifyContent={'space-between'} alignItems={'center'} gap={'5px'} left={'-1.6rem'} padding={'5px'} top={'50%'} style={{transform: 'translateY(-50%)'}}>
-            {tokenComp.d4 > 0 && <Typography sx={styles.complication}><b>{tokenComp.d4}</b> d4</Typography>}
-            {tokenComp.d6 > 0 && <Typography sx={styles.complication}><b>{tokenComp.d6}</b> d6</Typography>}
-            {tokenComp.d8 > 0 && <Typography sx={styles.complication}><b>{tokenComp.d8}</b> d8</Typography>}
-            {tokenComp.d10 > 0 && <Typography sx={styles.complication}><b>{tokenComp.d10}</b> d10</Typography>}
-            {tokenComp.d12 > 0 && <Typography sx={styles.complication}><b>{tokenComp.d12}</b> d12</Typography>}
-          </Box>
+        <Box width={'100%'} height='100%' sx={[styles.card, width !== '' ? styles.cardNormal : {}, token.slug === userCurrentToken ? styles.cardSelected : {}]} className={(userData.type === 'gm' || token.slug === userCurrentToken) ? 'draggable' : ''} >
           <SaImageWithFallback
-            className={(userData.type === 'gm' || token.slug === userCurrentToken) ? 'draggable' : ''} 
             fallback={`/tokens/default.png`} 
             src={`/tokens/${token.slug}.png`} 
             alt='' 
@@ -295,13 +287,23 @@ const SaModal = (props: saModalProps) => {
               }
             }}
           />
-          {(token.slug === userCurrentToken || userData.type === 'gm') && token.attr && <Box position={'absolute'} display={'flex'} flexDirection={'column'} justifyContent={'space-between'} alignItems={'center'} gap={'5px'} right={'-1.6rem'} padding={'5px'} top={'50%'} style={{transform: 'translateY(-50%)'}}>
+          <Box className='tokenName' position={'absolute'} display='flex' flexDirection='column' justifyContent='center' alignItems='center' bgcolor='rgba(0,0,0,0.4)' padding='0 1rem 0.2rem 1rem' left={0} bottom={0} width='100%' sx={{opacity: 0, pointerEvents: 'none'}}>
+            <Typography textAlign={'center'} fontSize='1rem' color='#FFF' fontWeight={'600'}>{token.name}</Typography>
+          </Box>
+          <Box position={'absolute'} display={'flex'} flexDirection={'column'} justifyContent={'space-between'} alignItems={'center'} gap={'5px'} left={'-1.6rem'} padding={'5px'} top={'50%'} style={{transform: 'translateY(-50%)'}}>
+            {tokenComp.d4 > 0 && <Typography sx={styles.complication}><b>{tokenComp.d4}</b> d4</Typography>}
+            {tokenComp.d6 > 0 && <Typography sx={styles.complication}><b>{tokenComp.d6}</b> d6</Typography>}
+            {tokenComp.d8 > 0 && <Typography sx={styles.complication}><b>{tokenComp.d8}</b> d8</Typography>}
+            {tokenComp.d10 > 0 && <Typography sx={styles.complication}><b>{tokenComp.d10}</b> d10</Typography>}
+            {tokenComp.d12 > 0 && <Typography sx={styles.complication}><b>{tokenComp.d12}</b> d12</Typography>}
+          </Box>
+          {(token.type === 'player' || userData.type === 'gm') && token.attr && <Box position={'absolute'} display={'flex'} flexDirection={'column'} justifyContent={'space-between'} alignItems={'center'} gap={'5px'} right={'-1.6rem'} padding={'5px'} top={'50%'} style={{transform: 'translateY(-50%)'}}>
             {token.attr.atk !== '' && <Typography sx={styles.attribute}><b>PF</b>{token.attr.atk}</Typography>}
             {token.attr.def !== '' && <Typography sx={styles.attribute}><b>RF</b>{token.attr.def}</Typography>}
             {token.attr.pow !== '' && <Typography sx={styles.attribute}><b>VA</b>{token.attr.pow}</Typography>}
             {token.attr.pp !== undefined && <Typography sx={[styles.attribute, {backgroundColor: '#0f4dbc'}]}><b>PP</b>{token.attr.pp}</Typography>}
           </Box>}
-          {menuOptions && <SaMenu
+          {menuOptions.length > 0 && <SaMenu
             position={width !== '' ? 'center' : 'left'}
             visible={activeTokenMenu === token.slug}
             items={menuOptions}
@@ -444,7 +446,8 @@ const styles = {
     perspective: '1000px',
     transition: 'all .6s ease',
     animation: 'shadeanm 6s ease-in-out infinite',
-    position: 'relative'
+    position: 'relative',
+    '&:hover .tokenName': {opacity: 1}
   },
   cardSelected: {
     '& img': {

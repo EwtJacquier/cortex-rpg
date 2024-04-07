@@ -17,7 +17,7 @@ interface AppProps {
   windowSize?: {width: number, height: number};
   login?: (user: string, password: string) => Promise<UserCredential | boolean>;
   updateToken?: (data: userModel, token?: string) => void;
-  updateCurrentMap?: (map: string, scene: string) => void;
+  updateCurrentMap?: (map: string, scene: string, sceneVisible: boolean, doomEnabled: boolean, doom: string, night: boolean, nigthScene: boolean) => void;
   sendMessage?: (token: any, message: string, dices: any, result: any) => void;
   changeCurrentToken?: (token: string) => void,
   isSheetOpen?: boolean,
@@ -264,7 +264,7 @@ export const AppProvider = ({children}: any) => {
     }    
   }
 
-  const updateCurrentMap = (map: string, scene: string) => {
+  const updateCurrentMap = (map: string, scene: string, sceneVisible: boolean, doomEnabled: boolean, doom: string, night: boolean, nigthScene: boolean) => {
     if (database.current && userData && tokensRef.current){
 
       runTransaction(ref(database.current, 'tokens'), (tokenList) => {
@@ -278,7 +278,12 @@ export const AppProvider = ({children}: any) => {
       });
 
       update(ref(database.current, 'game/map'), {
-        current: map
+        current: map,
+        scene_visible: sceneVisible,
+        doom_enabled: doomEnabled,
+        doom: doom,
+        night: night,
+        night_scene: nigthScene
       });
 
       update(ref(database.current, 'game/maps/' + map), {

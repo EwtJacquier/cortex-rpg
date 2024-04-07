@@ -17,12 +17,22 @@ const FormOptions = (props: FormProps) => {
 
   const [currentMap, setCurrentMap] = useState('')
   const [currentScene, setCurrentScene] = useState('')
+  const [doom, setDoom] = useState<string>()
+  const [doomEnabled, setDoomEnabled] = useState<boolean>()
+  const [sceneVisible, setSceneVisible] = useState<boolean>()
+  const [night, setNight] = useState<boolean>()
+  const [nightScene, setNightScene] = useState<boolean>()
 
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     if (gameData){
       setCurrentMap(gameData.map.current)
+      setDoom(gameData.map.doom)
+      setDoomEnabled(gameData.map.doom_enabled)
+      setSceneVisible(gameData.map.scene_visible)
+      setNight(gameData.map.night)
+      setNightScene(gameData.map.night_scene)
     }
     
   }, [gameData])
@@ -32,7 +42,7 @@ const FormOptions = (props: FormProps) => {
     setIsLoading(true);
 
     if (updateCurrentMap){
-      updateCurrentMap(currentMap, currentScene)
+      updateCurrentMap(currentMap, currentScene, sceneVisible !== undefined ? sceneVisible : false, doomEnabled !== undefined ? doomEnabled : false, doom !== undefined ? doom : '', night !== undefined ? night : false, nightScene !== undefined ? nightScene : false)
 
       props.afterSave()
     }
@@ -64,6 +74,43 @@ const FormOptions = (props: FormProps) => {
           value={Object.keys(gameData.maps[currentMap].scenes).indexOf(currentScene) > -1 ? currentScene : Object.keys(gameData.maps[currentMap].scenes)[0]}
           getValue={setCurrentScene}
         />
+      </Box>}
+      {gameData.map && <Box marginTop={'10px'} display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
+        {sceneVisible !== undefined && <SaInput
+          select={true}
+          items={[{value: '0', label: 'Não'}, {value: '1', label: 'Sim'}]}
+          label='Cena Visível'
+          value={sceneVisible ? '1' : '0'}
+          getValue={(value: string) => setSceneVisible(value === '1')}
+        />}
+        {night !== undefined && <SaInput
+          select={true}
+          items={[{value: '0', label: 'Não'}, {value: '1', label: 'Sim'}]}
+          label='Noite'
+          value={night ? '1' : '0'}
+          getValue={(value: string) => setNight(value === '1')}
+        />}
+        {nightScene !== undefined && <SaInput
+          select={true}
+          items={[{value: '0', label: 'Não'}, {value: '1', label: 'Sim'}]}
+          label='Noite na Cena'
+          value={nightScene ? '1' : '0'}
+          getValue={(value: string) => setNightScene(value === '1')}
+        />}
+      </Box>}
+      {gameData.map && <Box marginTop={'10px'} display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
+        {doom !== undefined && <SaInput
+          label='Doom'
+          value={doom}
+          getValue={setDoom}
+        />}
+        {doomEnabled !== undefined && <SaInput
+          select={true}
+          items={[{value: '0', label: 'Não'}, {value: '1', label: 'Sim'}]}
+          label='Doom Habilitado'
+          value={doomEnabled ? '1' : '0'}
+          getValue={(value: string) => setDoomEnabled(value === '1')}
+        />}
       </Box>}
       <SaButton loading={isLoading} variant='contained' text='Salvar' onClick={onSubmit}></SaButton>
     </Box>
