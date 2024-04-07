@@ -192,7 +192,7 @@ const SaModal = (props: saModalProps) => {
         }
 
         if (userTokenData.equips && userTokenData.equips[2]) {
-          let splitted = userTokenData.equips[1].split('|')
+          let splitted = userTokenData.equips[2].split('|')
           if (splitted.length > 1){
             dados[splitted[1]] += 1
           }
