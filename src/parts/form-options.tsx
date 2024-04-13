@@ -13,7 +13,7 @@ type FormProps = {
 }
 
 const FormOptions = (props: FormProps) => {
-  const {gameData, updateCurrentMap, userData, changeCurrentToken, userCurrentToken, tokens} = useApp()
+  const {gameData, updateCurrentMap, updateScene, updateDoom, userData, changeCurrentToken, userCurrentToken, tokens} = useApp()
 
   const [currentMap, setCurrentMap] = useState('')
   const [currentScene, setCurrentScene] = useState('')
@@ -42,7 +42,18 @@ const FormOptions = (props: FormProps) => {
     setIsLoading(true);
 
     if (updateCurrentMap){
-      updateCurrentMap(currentMap, currentScene, sceneVisible !== undefined ? sceneVisible : false, doomEnabled !== undefined ? doomEnabled : false, doom !== undefined ? doom : '', night !== undefined ? night : false, nightScene !== undefined ? nightScene : false)
+
+      if (currentMap !== gameData.map.current || currentScene !== gameData.maps[gameData.map.current].active_scene){
+        updateCurrentMap(currentMap, currentScene);
+      }
+
+      if (sceneVisible !== gameData.map.scene_visible || night !== gameData.map.night || nightScene !== gameData.map.night_scene){
+        updateScene(sceneVisible, night, nightScene)
+      }
+
+      if (doomEnabled !== gameData.map.doom_enabled || doom !== gameData.map.doom ){
+        updateDoom(doomEnabled, doom)
+      }
 
       props.afterSave()
     }
