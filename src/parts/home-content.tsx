@@ -22,9 +22,11 @@ const HomeContent = () => {
   const {windowSize, gameData, userData, tokens, isSheetOpen, setIsSheetOpen, messages} = useApp()
   const router = useRouter()
 
-  if (!userData){
-    router.push('/')
-  }
+  useEffect(() => {
+    if (!userData){
+      router.push('/')
+    }
+  },[router])
 
   useEffect(() => {
     if (userData === null){
