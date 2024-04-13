@@ -102,38 +102,10 @@ export const AppProvider = ({children}: any) => {
     chatRef.current = ref(database.current, 'chat')
     auth.current = getAuth(app)
     
+    /*
     onAuthStateChanged(auth.current, (user) => {
-      if (user) {
-        onChildAdded(chatRef.current, (data) => {
-          data = data.val()
-
-          if (data){
-            setNewMessage(data)
-          }
-        });
-    
-        const updateGameData = (data: any) => {
-          setGameData(data)
-        }
-    
-        const updateUsers = (data: any) => {
-          setUsers(data)
-        }
-    
-        const updateTokens = (data: any) => {
-          setTokens(data)
-        }
-    
-        consume(gameRef.current, updateGameData)
-        observe(gameRef.current, updateGameData)
-    
-        consume(usersRef.current, updateUsers)
-        observe(usersRef.current, updateUsers)
-    
-        consume(tokensRef.current, updateTokens)
-        observe(tokensRef.current, updateTokens)
-
-        setUser(user)
+      if (!user) {
+        
       } else {
         setUser(null)
         setUserData(null)
@@ -142,6 +114,7 @@ export const AppProvider = ({children}: any) => {
         setUserTokenData(null)
       }
     });
+    */
     
   },[])
 
@@ -203,13 +176,49 @@ export const AppProvider = ({children}: any) => {
     }
   }
 
-  const login = async (email: string, password: string): Promise<UserCredential | boolean> => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     return new Promise(async (resolve,reject) => {
       if (auth.current){
         try {
           const userCredential: UserCredential = await signInWithEmailAndPassword(auth.current, email, password)
 
-          resolve(userCredential)
+          if (userCredential.user){
+            onChildAdded(chatRef.current, (data) => {
+              data = data.val()
+    
+              if (data){
+                setNewMessage(data)
+              }
+            });
+        
+            const updateGameData = (data: any) => {
+              setGameData(data)
+            }
+        
+            const updateUsers = (data: any) => {
+              setUsers(data)
+            }
+        
+            const updateTokens = (data: any) => {
+              setTokens(data)
+            }
+        
+            consume(gameRef.current, updateGameData)
+            observe(gameRef.current, updateGameData)
+        
+            consume(usersRef.current, updateUsers)
+            observe(usersRef.current, updateUsers)
+        
+            consume(tokensRef.current, updateTokens)
+            observe(tokensRef.current, updateTokens)
+    
+            setUser(userCredential.user)
+
+            resolve(true)
+          }
+          else{
+            reject(false)  
+          }
         }
         catch{
           reject(false)  
