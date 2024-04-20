@@ -45,37 +45,38 @@ const FormLogin = () => {
   }, [userData])
 
   return (
-    <Box display='flex' flexDirection='column' style={styles.container}>
-      {errorMessage && <SaMessage type='error' message={errorMessage} onClose={() => {setErrorMessage('')}} />}
-      <Typography variant="h3" component="h1" style={styles.text} textAlign='center'>
-        Cortex RPG
-      </Typography>
-      <SaInput
-        type="email"
-        placeholder='E-mail'
-        autoComplete="one-time-code"
-        value={email}
-        validator={validateEmail}
-        getValid={setValidEmail}
-        getValue={setEmail}
-      />
-      <SaInput
-        placeholder="Senha"
-        type="password"
-        autoComplete="one-time-code"
-        value={password}
-        validator={validateNotEmpty}
-        getValid={setValidPassword}
-        getValue={setPassword}
-      />
-      <SaButton
-        style={styles.btnSubmit}
-        text='Entrar'
-        loading={isLoading}
-        variant='contained'
-        onClick={onSubmit}
-      />
-    </Box>
+    <form action="" onSubmit={(e) => {e.preventDefault(); onSubmit(); return false; }}>
+      <Box display='flex' flexDirection='column' style={styles.container}>
+        {errorMessage && <SaMessage type='error' message={errorMessage} onClose={() => {setErrorMessage('')}} />}
+        <Typography variant="h3" component="h1" style={styles.text} textAlign='center'>
+          Cortex RPG
+        </Typography>
+        <SaInput
+          type="email"
+          placeholder='E-mail'
+          autoComplete="one-time-code"
+          value={email}
+          validator={validateEmail}
+          getValid={setValidEmail}
+          getValue={setEmail}
+        />
+        <SaInput
+          placeholder="Senha"
+          type="password"
+          autoComplete="one-time-code"
+          value={password}
+          validator={validateNotEmpty}
+          getValid={setValidPassword}
+          getValue={setPassword}
+        />
+        <SaButton
+          style={styles.btnSubmit}
+          text='Entrar'
+          loading={isLoading}
+          variant='contained'
+        />
+      </Box>
+    </form>
   )
 }
 

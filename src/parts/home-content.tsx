@@ -104,6 +104,10 @@ const HomeContent = () => {
                       {dices.map((item, index) => {
                         item = item.split('|')
                         let max = item[0].replace('d','')
+                        console.log(max, item[1])
+                        if (max == 10 && item[1] == 0){
+                          item[1] = 10
+                        }
                         return (
                           <Box key={index} color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'30px'} textAlign={'center'}>
                             <Typography textAlign={'center'} color={item[1] == max ? '#23ba23' : (item[1] == 1 ? 'red' : 'white')}>{item[1]}</Typography>

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, child, get, onValue, DatabaseReference, set, Database, update, onChildAdded, runTransaction  } from "firebase/database";
+import { getDatabase, ref, child, get, onValue, DatabaseReference, set, Database, update, onChildAdded, runTransaction, remove  } from "firebase/database";
 import { Auth, User, UserCredential, getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import * as BdMask from "../helpers/mask"
 
@@ -17,6 +17,10 @@ interface AppProps {
   windowSize?: {width: number, height: number};
   login?: (user: string, password: string) => Promise<UserCredential | boolean>;
   updateToken?: (data: userModel, token?: string) => void;
+  duplicateMonsterToken?: (slug: string) => void;
+  deleteToken?: (slug: string) => void;
+  addPP?: (slug: string) => void;
+  subtractPP?: (slug: string) => void;
   updateCurrentMap?: (map: string, scene: string) => void;
   updateScene?: (sceneVisible: boolean, night: boolean, nigthScene: boolean) => void,
   updateDoom?: (doomEnabled: boolean, doom: string) => void,
@@ -233,6 +237,47 @@ export const AppProvider = ({children}: any) => {
     
   }
 
+  const duplicateMonsterToken = (slug: string) => {
+    const newSlug = slug + '_copy'
+
+    if (database.current && tokens && tokens[slug] && typeof(tokens[newSlug]) === 'undefined'){
+      let objToInsert: any = {}
+      
+      objToInsert[newSlug] = tokens[slug]
+      objToInsert[newSlug].slug = newSlug
+
+      update(ref(database.current, 'tokens'), objToInsert);
+    }
+  }
+
+  const deleteToken = (slug: string) => {
+    if (database.current && tokens && tokens[slug]){
+      remove(ref(database.current, 'tokens/'+slug));
+    }
+  }
+
+  const addPP = (slug: string) => {
+    if (database.current && tokens && tokens[slug]){
+      const newPP = parseInt(tokens[slug].attr?.pp ? tokens[slug].attr.pp : 0) + 1;
+
+      let newObj = tokens[slug].attr
+      newObj['pp'] = newPP
+
+      update(ref(database.current, 'tokens/'+slug+'/attr'), newObj);
+    }
+  }
+
+  const subtractPP = (slug: string) => {
+    if (database.current && tokens && tokens[slug]){
+      const newPP = parseInt(tokens[slug].attr?.pp ? tokens[slug].attr.pp : 0) - 1;
+
+      let newObj = tokens[slug].attr
+      newObj['pp'] = newPP
+
+      update(ref(database.current, 'tokens/'+slug+'/attr'), newObj);
+    }
+  }
+
   const updateToken = (data: userModel, token?: string) => {
     if (database.current && userCurrentToken && userData){
       update(ref(database.current, 'tokens/' + (userData.type === 'gm' && token ? token : userCurrentToken)), data);
@@ -335,6 +380,10 @@ export const AppProvider = ({children}: any) => {
     windowSize,
     login,
     updateToken,
+    duplicateMonsterToken,
+    deleteToken,
+    addPP,
+    subtractPP,
     updateCurrentMap,
     updateScene,
     updateDoom,

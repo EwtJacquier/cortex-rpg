@@ -26,7 +26,7 @@ type diceTypes = {
 }
 
 const SaModal = (props: saModalProps) => {
-  const {windowSize, userData, sendMessage, tokens, gameData, userCurrentToken, updateToken, changeCurrentToken, setIsSheetOpen, userTokenData} = useApp()
+  const {windowSize, userData, sendMessage, duplicateMonsterToken, tokens, addPP, subtractPP, deleteToken, gameData, userCurrentToken, updateToken, changeCurrentToken, setIsSheetOpen, userTokenData} = useApp()
   const [sceneTokens, setSceneTokens] = useState<any[]>([false])
   const [availableTokens, setAvailableTokens] = useState<any[]>([])
   const [activeTokenMenu, setActiveTokenMenu] = useState('')
@@ -153,7 +153,6 @@ const SaModal = (props: saModalProps) => {
 
       const message = 'Atacou '+tokens[slug].name+' ('+(type === 'close' ? 'Corpo à corpo' : 'Longa distância')+')'
 
-
       setMessageToSend({token: userTokenData.name, message: message, dices: dados})
       setDices({d4: dados.d4, d6: dados.d6, d8: dados.d8, d10: dados.d10, d12: dados.d12})
       setActiveTokenMenu('');
@@ -264,8 +263,21 @@ const SaModal = (props: saModalProps) => {
       menuOptions.push({action: editSheet, text: 'Editar Ficha'})
     }
 
+    if (userData.type === 'gm' || token.slug === userCurrentToken){
+      menuOptions.push({action: () => {if (addPP) addPP(token.slug); setActiveTokenMenu('') }, text: 'Adicionar PP'})
+      menuOptions.push({action: () => {if (subtractPP) subtractPP(token.slug); setActiveTokenMenu('') }, text: 'Remover PP'})
+    }
+
     if (userData.type === 'gm' && token.slug !== userCurrentToken){
       menuOptions.push({action: () => {if (changeCurrentToken) changeCurrentToken(token.slug); setActiveTokenMenu('') }, text: 'Usar Token'})
+    }
+
+    if (userData.type === 'gm' && token.type !== 'player' && duplicateMonsterToken){
+      menuOptions.push({action: () => {if (changeCurrentToken) duplicateMonsterToken(token.slug); setActiveTokenMenu('') }, text: 'Duplicar'})
+    }
+
+    if (userData.type === 'gm' && token.type !== 'player' && deleteToken){
+      menuOptions.push({action: () => {if (changeCurrentToken && confirm(`Confirma exclusão do token "${token.name}" ?`)) deleteToken(token.slug); setActiveTokenMenu('') }, text: 'Excluir'})
     }
 
     return (
@@ -273,7 +285,7 @@ const SaModal = (props: saModalProps) => {
         <Box width={'100%'} height='100%' sx={[styles.card, width !== '' ? styles.cardNormal : {}, token.slug === userCurrentToken ? styles.cardSelected : {}]} className={(userData.type === 'gm' || token.slug === userCurrentToken) ? 'draggable' : ''} >
           <SaImageWithFallback
             fallback={`/tokens/default.png`} 
-            src={`/tokens/${token.slug}.png`} 
+            src={`/tokens/${token.slug.replace(/_copy/g, "")}.png`} 
             alt='' 
             width={500} 
             height={500} 
