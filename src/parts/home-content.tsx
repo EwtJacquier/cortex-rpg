@@ -68,7 +68,7 @@ const HomeContent = () => {
             <Box width='100vw' height='100vh' position='relative' overflow='visible'>
               {gameData.map && currentMap && <Image src={`/scenes/${currentMap}.webp`} alt='' width={windowSize?.width} height={windowSize?.height} style={{width: '100%', height: '100%', objectFit:'cover', pointerEvents: 'none' }}/>}
               {gameData.map && gameData.maps[currentMap].effect && renderVideo(`/effects/${gameData.maps[currentMap].effect}.webm`, videoRef)}
-              {gameData.map && gameData.map.night && <Box position='absolute' top={0} left={0} width={windowSize?.width} height={windowSize?.height} bgcolor='rgb(0 39 255 / 60%)' style={{mixBlendMode: 'darken'}}/>}
+              {gameData.map && gameData.map.night && <Box position='absolute' top={0} left={0} width={windowSize?.width} height={windowSize?.height} bgcolor='rgb(0 20 210 / 86%)' style={{mixBlendMode: 'darken'}}/>}
               <Box sx={styles.title}>
                 {gameData.map.doom_enabled && <Box display='flex' gap='5px' justifyContent='center' marginBottom='5px'>
                   {gameData.map.doom.split(',').map((item: string, index: number)=><Typography key={index} color='#FFF' fontSize='1rem' fontWeight='bold' padding='0 5px' style={{backgroundColor: 'rgba(0,0,0,0.4)'}}>{item}</Typography>)}
@@ -126,7 +126,7 @@ const HomeContent = () => {
         </Box>
         {(gameData.map.scene_visible || userData.type === 'gm') && gameData.maps[currentMap].active_scene && <SaModal getCanvasOpen={(open: boolean) => {setIsCanvasOpen(open)}} doom={gameData.map.doom_enabled && gameData.map.doom} isOpen={isSceneOpen} getIsOpen={setIsSceneOpen} bg={`/scenes/${currentMap}_${gameData.maps[currentMap].active_scene}.webp`} title={gameData.maps[currentMap].scenes[gameData.maps[currentMap].active_scene].name} size={gameData.maps[currentMap].scenes[gameData.maps[currentMap].active_scene].size}>
           {gameData.map && gameData.maps[currentMap].scenes[gameData.maps[currentMap].active_scene].effect && renderVideo(`/effects/${gameData.maps[currentMap].scenes[gameData.maps[currentMap].active_scene].effect}.webm`, videoRef2)}
-          {gameData.map && gameData.map.night_scene && <Box position='absolute' top={0} left={0} width={'100%'} height={'100%'} bgcolor='rgb(0 39 255 / 60%)' style={{mixBlendMode: 'darken'}}/>}
+          {gameData.map && gameData.map.night_scene && <Box position='absolute' top={0} left={0} width={'100%'} height={'100%'} bgcolor='rgb(0 20 210 / 86%)' style={{mixBlendMode: 'darken'}}/>}
         </SaModal>}
         <SaModalBasic isOpen={isSheetOpen} getIsOpen={setIsSheetOpen}>
           <FormFicha afterSave={() => setIsSheetOpen(false)}/>
