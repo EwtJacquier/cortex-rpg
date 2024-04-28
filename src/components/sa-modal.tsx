@@ -245,7 +245,7 @@ const SaModal = (props: saModalProps) => {
 
     if (width === ''){
 
-      if (token.slug !== userCurrentToken && token.type !== userTokenData.type){
+      if (token.slug !== userCurrentToken){
         menuOptions = [
           {action: () => {def(token.slug)}, text: 'Defender-se'},
         ]
