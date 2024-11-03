@@ -9,7 +9,7 @@ import theme from '@/app/theme';
 type saInputProps = {
   label?: string,
   placeholder?: string,
-  type?: 'email' | 'password' | 'tel' | 'text',
+  type?: 'email' | 'password' | 'tel' | 'text' | 'number',
   select?: boolean,
   items?: Array<{value: string, label: string}>,
   autoComplete?: string,
@@ -95,6 +95,10 @@ const SaInput = (props: saInputProps) => {
 
   if (props.readonly){
     inputPropsObject['readOnly'] = props.readonly
+  }
+
+  if (props.type === 'number') {
+    inputPropsObject['min'] = 0;
   }
 
   if (props.icon){

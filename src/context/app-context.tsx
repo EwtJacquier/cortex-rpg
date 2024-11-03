@@ -21,10 +21,11 @@ interface AppProps {
   deleteToken?: (slug: string) => void;
   addPP?: (slug: string) => void;
   subtractPP?: (slug: string) => void;
+  setAttr?: (attr: 'pv'|'pm', slug: string, val: string|null) => void;
   updateCurrentMap?: (map: string, scene: string) => void;
   updateScene?: (sceneVisible: boolean, night: boolean, nigthScene: boolean) => void,
   updateDoom?: (doomEnabled: boolean, doom: string) => void,
-  sendMessage?: (token: any, message: string, dices: any, result: any) => void;
+  sendMessage?: (token: any, message: string, dices: any, result: any, target?: any) => void;
   changeCurrentToken?: (token: string) => void,
   isSheetOpen?: boolean,
   setIsSheetOpen?: (open: boolean) => void,
@@ -38,9 +39,14 @@ export type userModel = {
   level?: number,
   money?: string,
   attr?: {
-    def?: string,
-    atk?: string,
-    pow?: string
+    pv?: string,
+    pvmax?: string,
+    pm?: string,
+    pmmax?: string,
+    mv?: string,
+    al?: string,
+    df?: string,
+    dif?: string,
   },
   combat?:{
     solo?: string,
@@ -206,7 +212,7 @@ export const AppProvider = ({children}: any) => {
             }
         
             const updateTokens = (data: any) => {
-              setTokens(data)
+              setTokens(data);
             }
         
             consume(gameRef.current, updateGameData)
@@ -256,6 +262,22 @@ export const AppProvider = ({children}: any) => {
     }
   }
 
+  const setAttr = (attr: 'pv'|'pm', slug : string, val: string|null) => {
+    if (database.current && tokens && tokens[slug] && val && parseInt(val) > -1){
+      let newObj = tokens[slug].attr
+
+      if (val.trim().indexOf('+') === 0) {
+        newObj[attr] = (parseInt(newObj[attr]) + parseInt(val)).toString();
+      } else if (val.trim().indexOf('-') === 0) {
+        newObj[attr] = (parseInt(newObj[attr]) - parseInt(val)).toString();
+      } else {
+        newObj[attr] = parseInt(val).toString();
+      }
+
+      update(ref(database.current, 'tokens/'+slug+'/attr'), newObj);
+    }
+  }
+
   const addPP = (slug: string) => {
     if (database.current && tokens && tokens[slug]){
       const newPP = parseInt(tokens[slug].attr?.pp ? tokens[slug].attr.pp : 0) + 1;
@@ -284,7 +306,7 @@ export const AppProvider = ({children}: any) => {
     }
   }
 
-  const sendMessage = (token: any, message: string, dices: any, result: any) => {
+  const sendMessage = (token: any, message: string, dices: any, result: any, target: any = null) => {
     if (userData && user && users && database.current && message && token){
       
 
@@ -309,6 +331,10 @@ export const AppProvider = ({children}: any) => {
             d10: dices.d10,
             d12: dices.d12,
           }
+        }
+
+        if (target) {
+          obj.target = target;
         }
 
         set(ref(database.current, 'chat/' + time), obj);
@@ -390,7 +416,8 @@ export const AppProvider = ({children}: any) => {
     sendMessage,
     changeCurrentToken,
     isSheetOpen,
-    setIsSheetOpen
+    setIsSheetOpen,
+    setAttr
   };
 
   return (

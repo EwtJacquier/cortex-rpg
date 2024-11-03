@@ -15,7 +15,7 @@ type saMenuProps = {
 
 const SaMenu = (props: saMenuProps) => {
   return (
-    <Box sx={{position: 'absolute', backgroundColor: '#000', width: '120px', left: props.position === 'left' ? '80%' : '50%', top: '50%', transform: `translate(${props.position === 'center' ? '-50%' : '0'}, -50%)`, display: props.visible ? 'block' : 'none' }}>
+    <Box sx={{position: 'absolute', backgroundColor: '#000', width: '120px', zIndex: 2, left: props.position === 'left' ? '80%' : '50%', top: '50%', transform: `translate(${props.position === 'center' ? '-50%' : '0'}, -50%)`, display: props.visible ? 'block' : 'none' }}>
       <MenuList>
         {props.items.map((item, index) => {
           return (

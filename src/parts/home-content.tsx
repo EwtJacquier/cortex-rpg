@@ -104,7 +104,6 @@ const HomeContent = () => {
                       {dices.map((item, index) => {
                         item = item.split('|')
                         let max = item[0].replace('d','')
-                        console.log(max, item[1])
                         if (max == 10 && item[1] == 0){
                           item[1] = 10
                         }

@@ -15,10 +15,9 @@ const FormFicha = (props: FormProps) => {
   const {userTokenData, updateToken} = useApp()
 
   const [complications, setComplications] = useState<string[]>(['Ferimento','Sangramento','','','','','',''])
-  const [distinctions, setDistinctions] = useState<string[]>(['','',''])
-  const [habilities, setHabilities] = useState<string[]>(['','',''])
-  const [equips, setEquips] = useState<string[]>(['','','','',''])
-  const [resources, setResources] = useState<string[]>(['','','','',''])
+  const [macros, setMacros] = useState<string[]>(['','','','',''])
+  const [itens, setItens] = useState<string[]>(['skill=Poção de Vida (ação)|desc=Recupera 15 pontos de vida.:::5','skill=Amuleto da Sorte (ação)|desc=Recupera 5 pontos de protagonismo.:::1','','',''])
+  const [others, setOthers] = useState<string[]>(['','','','',''])
   const [canShowLoop, setCanShowLoop] = useState(false)
   
   const [isLoading, setIsLoading] = useState(false)
@@ -29,21 +28,17 @@ const FormFicha = (props: FormProps) => {
       if (userTokenData.complications){
         setComplications(userTokenData.complications)
       }
-
-      if (userTokenData.resources){
-        setResources(userTokenData.resources)
+      
+      if (userTokenData.macros){
+        setMacros(userTokenData.macros)
       }
 
-      if (userTokenData.distinctions){
-        setDistinctions(userTokenData.distinctions)
+      if (userTokenData.itens){
+        setItens(userTokenData.itens)
       }
 
-      if (userTokenData.habilities){
-        setHabilities(userTokenData.habilities)
-      }
-
-      if (userTokenData.equips){
-        setEquips(userTokenData.equips)
+      if (userTokenData.others){
+        setOthers(userTokenData.others)
       }
     }
 
@@ -73,7 +68,7 @@ const FormFicha = (props: FormProps) => {
               newTokenInfo[keys[0]][parseInt(keys[1])] = value
             }
             else{
-              if (newTokenInfo[keys[0]][parseInt(keys[1])]) newTokenInfo[keys[0]][parseInt(keys[1])] += '|'+ value
+              if (newTokenInfo[keys[0]][parseInt(keys[1])]) newTokenInfo[keys[0]][parseInt(keys[1])] += ':::'+ value
             }
             
           }
@@ -101,11 +96,46 @@ const FormFicha = (props: FormProps) => {
   }
 
   const dice_data = [
+    {value: '', label: '-'},
     {value: 'd4', label: 'D4'},
     {value: 'd6', label: 'D6'},
     {value: 'd8', label: 'D8'},
     {value: 'd10', label: 'D10'},
     {value: 'd12', label: 'D12'},
+  ]
+
+  const mv_al_data = [
+    {value: '1', label: '1 casa'},
+    {value: '2', label: '2 casas'},
+    {value: '3', label: '3 casas'},
+    {value: '4', label: '4 casas'},
+    {value: '5', label: '5 casas'}
+  ]
+
+  const number_data = [
+    {value: '1', label: '1'},
+    {value: '2', label: '2'},
+    {value: '3', label: '3'},
+    {value: '4', label: '4'},
+    {value: '5', label: '5'}
+  ]
+
+  const difficulty = [
+    {value: '1', label: 'Fácil'},
+    {value: '2', label: 'Médio'},
+    {value: '3', label: 'Difícil'},
+    {value: '4', label: 'Expert'}
+  ]
+
+  const pv_pm_max = [
+    {value: '15', label: '15'},
+    {value: '20', label: '20'},
+    {value: '25', label: '25'},
+    {value: '30', label: '30'},
+    {value: '35', label: '35'},
+    {value: '40', label: '40'},
+    {value: '45', label: '45'},
+    {value: '50', label: '50'},
   ]
 
   return (
@@ -115,250 +145,131 @@ const FormFicha = (props: FormProps) => {
     <form style={styles.container} onSubmit={onSubmit}>
       <Box marginTop={'10px'} display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
         <SaInput
-          select={true}
-          items={dice_data}
-          label='Resistência Física'
-          name='attr_def'
-          value={userTokenData?.attr?.def}
+          type='number'
+          label='PV Atual'
+          name='attr_pv'
+          value={userTokenData?.attr?.pv}
         />
         <SaInput
-          select={true}
-          items={dice_data}
-          label='Poder de Fogo'
-          name='attr_atk'
-          value={userTokenData?.attr?.atk}
-        />
-        <SaInput
-          select={true}
-          items={dice_data}
-          label='Vínculo Ancestral'
-          name='attr_pow'
-          value={userTokenData?.attr?.pow}
+          type='number'
+          label='PV Máximo'
+          name='attr_pvmax'
+          value={userTokenData?.attr?.pvmax}
         />
       </Box>
-      <Box display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
+      <Box marginTop={'10px'} display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
         <SaInput
-          select={true}
-          items={dice_data}
-          label='Combate Solo'
-          name='combat_solo'
-          value={userTokenData?.combat?.solo}
+          type='number'
+          label='PP Atual'
+          name='attr_pm'
+          value={userTokenData?.attr?.pm}
         />
         <SaInput
-          select={true}
-          items={dice_data}
-          label='Combate em Dupla'
-          name='combat_partner'
-          value={userTokenData?.combat?.partner}
-        />
-        <SaInput
-          select={true}
-          items={dice_data}
-          label='Combate em Grupo'
-          name='combat_group'
-          value={userTokenData?.combat?.group}
+          type='number'
+          label='PP Máximo'
+          name='attr_pmmax'
+          value={userTokenData?.attr?.pmmax}
         />
       </Box>
-      <Box display={'flex'} justifyContent={'space-between'} gap={'20px'}>
-        <Box width={'50%'} flexDirection={'column'} display={'flex'} gap='15px'>
-          <Typography component='h2' variant='h6'>Pontos de Plot</Typography>
-          <Box display='flex' flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
-            <SaInput
-              placeholder={''}
-              readonly={true}
-              value={'Plot Points'}
-            />
-            <Box sx={{width: '35%'}}>
-              <SaInput
-                select={true}
-                items={[0,1,2,3,4,5,6,7,8,9,10].map((item) => {return {label: item.toString(), value: item.toString()}})}
-                name='attr_pp'
-                value={userTokenData && userTokenData.attr && userTokenData.attr.pp ? userTokenData.attr.pp : '0'}
-              />
-            </Box>
-          </Box>
-          <Typography component='h2' variant='h6'>Equipamento</Typography>
-          {canShowLoop && equips.map((item, index) => {
-            const comp = item.split('|')
-            return <Box display='flex' key={'h_'+index} flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
-              <SaInput
-                label={index === 0 ? 'À distância' : (index === 1 ? 'Corpo a corpo' : (index === 2 ? 'Defensivo' : 'Acessório'))}
-                name={`equips_${index}_name`}
-                value={comp[0] ? comp[0] : ''}
-              />
-              <Box sx={{width: '35%'}}>
-              <SaInput
-                select={true}
-                name={`equips_${index}_value`}
-                items={[{label: '-', value: '-'}, ...dice_data]}
-                value={comp[1] ? comp[1] : '-'}
-              />
-              </Box>
-            </Box>
-          })}
-          <Typography component='h2' variant='h6'>Bônus de Classe</Typography>
-          <Box display='flex' flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
-            <SaInput
-              placeholder={''}
-              readonly={true}
-              value={'Ataque'}
-            />
-            <Box sx={{width: '35%'}}>
-              <SaInput
-                select={true}
-                items={[{label: '-', value: '-'}, ...dice_data]}
-                name='bonus_atk1'
-                value={userTokenData?.bonus?.atk1}
-              />
-            </Box>
-            <Box sx={{width: '35%'}}>
-              <SaInput
-                select={true}
-                items={[{label: '-', value: '-'}, ...dice_data]}
-                name='bonus_atk2'
-                value={userTokenData?.bonus?.atk2}
-              />
-            </Box>
-          </Box>
-          <Box display='flex' flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
-            <SaInput
-              placeholder={''}
-              readonly={true}
-              value={'Defesa'}
-            />
-            <Box sx={{width: '35%'}}>
-              <SaInput
-                select={true}
-                items={[{label: '-', value: '-'}, ...dice_data]}
-                name='bonus_def1'
-                value={userTokenData?.bonus?.def1}
-              />
-            </Box>
-            <Box sx={{width: '35%'}}>
-              <SaInput
-                select={true}
-                items={[{label: '-', value: '-'}, ...dice_data]}
-                name='bonus_def2'
-                value={userTokenData?.bonus?.def2}
-              />
-            </Box>
-          </Box>
-          <Typography component='h2' variant='h6'>Distinções</Typography>
-          {canShowLoop && distinctions.map((item, index) => {
-            const comp = item.split('|')
-            return <Box display='flex' key={'d_'+index} flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
-              <SaInput
-                placeholder={''}
-                name={`distinctions_${index}_name`}
-                value={comp[0] ? comp[0] : ''}
-              />
-              <Box sx={{width: '35%'}}>
-              <SaInput
-                select={true}
-                name={`distinctions_${index}_value`}
-                items={[{label: '-', value: '-'}, ...dice_data]}
-                value={comp[1] ? comp[1] : '-'}
-              />
-              </Box>
-            </Box>
-          })}
-          <Typography component='h2' variant='h6'>Habilidades</Typography>
-          {canShowLoop && habilities.map((item, index) => {
-            const comp = item.split('|')
-            return <Box display='flex' key={'h_'+index} flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
-              <SaInput
-                placeholder={''}
-                name={`habilities_${index}_name`}
-                value={comp[0] ? comp[0] : ''}
-              />
-              <Box sx={{width: '35%'}}>
-              <SaInput
-                select={true}
-                name={`habilities_${index}_value`}
-                items={[{label: '-', value: '-'}, ...dice_data]}
-                value={comp[1] ? comp[1] : '-'}
-              />
-              </Box>
-            </Box>
-          })}
+      <Box marginTop={'10px'} display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
+        <SaInput
+          select={true}
+          items={difficulty}
+          label='Dificuldade do Minigame'
+          name='attr_dif'
+          value={userTokenData?.attr?.dif}
+        />
+      </Box>
+      <Typography component='h2' variant='h6' display='flex' justifyContent='space-between'>Atributos</Typography>
+      <Box marginTop={'10px'} display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
+        <SaInput
+          select={true}
+          items={mv_al_data}
+          label='Movimentação'
+          name='attr_mv'
+          value={userTokenData?.attr?.mv}
+        />
+        <SaInput
+          select={true}
+          items={number_data}
+          label='Defesa'
+          name='attr_df'
+          value={userTokenData?.attr?.df}
+        />
+      </Box>
+      <Typography component='h2' variant='h6'>Arma Principal</Typography>
+      <Box display='flex' flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
+        <SaInput
+          type='text'
+          label='Nome da Arma'
+          name='attr_weapon'
+          value={userTokenData?.attr?.weapon}
+        />
+        <SaInput
+          type='number'
+          label='Dano Fixo'
+          name='attr_damage'
+          value={userTokenData?.attr?.damage}
+        />
+        <SaInput
+          select={true}
+          items={dice_data}
+          label='Dano Variável'
+          name='attr_dices'
+          value={userTokenData?.attr?.dices}
+        />
+        <SaInput
+          select={true}
+          items={mv_al_data}
+          label='Alcance'
+          name='attr_al'
+          value={userTokenData?.attr?.al}
+        />
+      </Box>
+      <Typography component='h2' variant='h6' display='flex' justifyContent='space-between'>Habilidades <small style={{fontSize: '1rem', fontWeight: 'normal'}}>Macro = skill|desc|pp|dados|fixo|arma|proprio</small></Typography>
+      {canShowLoop && macros.map((item, index) => {
+        const comp = item.split(':::')
+        return <Box display='flex' key={'m_'+index} flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
+          <SaInput
+            type="text"
+            placeholder="Macro"
+            name={`macros_${index}_value`}
+            value={comp[0] ? comp[0] : ''}
+          />
         </Box>
-        <Box width={'50%'} flexDirection={'column'} display={'flex'} gap='15px'>
-          <Typography component='h2' variant='h6'>Stress</Typography>
-          <Box display='flex' flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
-            <SaInput
-              placeholder={''}
-              readonly={true}
-              value={'Corpo'}
-            />
-            <Box sx={{width: '35%'}}>
-              <SaInput
-                select={true}
-                items={[{label: '-', value: '-'}, ...dice_data]}
-                name='stress_body'
-                value={userTokenData?.stress?.body}
-              />
-            </Box>
+      })}
+      <Typography component='h2' variant='h6' display='flex' justifyContent='space-between'>Consumíveis <small style={{fontSize: '1rem', fontWeight: 'normal'}}>Macro = skill|desc|pp|dados|fixo|arma|proprio</small></Typography>
+      {canShowLoop && itens.map((item, index) => {
+        const comp = item.split(':::')
+        return <Box display='flex' key={'i_'+index} flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
+          <SaInput
+            type="text"
+            placeholder="Macro"
+            name={`items_${index}_value`}
+            value={comp[0] ? comp[0] : ''}
+          />
+          <Box sx={{width: '25%'}}>
+          <SaInput
+            type="number"
+            placeholder={'Qtd'}
+            name={`items_${index}_quantity`}
+            value={comp[1] ? comp[1] : ''}
+          />
           </Box>
-          <Box display='flex' flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
-            <SaInput
-              placeholder={''}
-              readonly={true}
-              value={'Mente'}
-            />
-            <Box sx={{width: '35%'}}>
-              <SaInput
-                select={true}
-                items={[{label: '-', value: '-'}, ...dice_data]}
-                name='stress_mind'
-                value={userTokenData?.stress?.mind}
-              />
-            </Box>
-          </Box>
-          <Typography component='h2' variant='h6'>Complicações</Typography>
-          {canShowLoop && complications.map((item, index) => {
-            const comp = item.split('|')
-
-            return <Box display='flex' key={'c_'+index} flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
-              <SaInput
-                placeholder={''}
-                name={`complications_${index}_name`}
-                value={
-                  index === 0 ? 'Ferimento' : 
-                  (index === 1 ? 'Sangramento' : (comp[0] ? comp[0] : ''))
-                }
-                readonly={index <= 1}
-              />
-              <Box sx={{width: '35%'}}>
-              <SaInput
-                select={true}
-                name={`complications_${index}_value`}
-                items={[{label: '-', value: '-'}, ...dice_data]}
-                value={comp[1] ? comp[1] : '-'}
-              />
-              </Box>
-            </Box>
-          })}
-          <Typography component='h2' variant='h6'>Itens / Recursos</Typography>
-          {canShowLoop && resources.map((item, index) => {
-            const comp = item.split('|')
-            return <Box display='flex' key={'r_'+index} flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
-              <SaInput
-                name={`resources_${index}_name`}
-                value={index === 0 ? 'Dinheiro' : (comp[0] ? comp[0] : '')}
-                readonly={index === 0}
-              />
-              <Box sx={{width: '35%'}}>
-              <SaInput
-                select={true}
-                name={`resources_${index}_value`}
-                items={[{label: '-', value: '-'}, ...dice_data]}
-                value={comp[1] ? comp[1] : '-'}
-              />
-              </Box>
-            </Box>
-          })}
         </Box>
-      </Box>
+      })}
+      <Typography component='h2' variant='h6' display='flex' justifyContent='space-between'>Anotações / Outros</Typography>
+      {canShowLoop && others.map((item, index) => {
+        const comp = item.split(':::')
+        return <Box display='flex' key={'o_'+index} flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
+          <SaInput
+            type="text"
+            placeholder="Descrição"
+            name={`others_${index}`}
+            value={comp[0] ? comp[0] : ''}
+          />
+        </Box>
+      })}
       <SaButton style={styles.btnSubmit} loading={isLoading} variant='contained' text='Salvar'></SaButton>
     </form>
     </Box>
