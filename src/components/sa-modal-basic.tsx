@@ -19,6 +19,7 @@ const SaModalBasic = (props: saModalProps) => {
     <Modal
       open={props.isOpen ?? false}
       onClose={handleClose}
+      sx={[{zIndex: 999999}]}
       aria-labelledby="parent-modal-title"
       aria-describedby="parent-modal-description"
     >

@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import SaModalBasic from '@/components/sa-modal-basic';
 import FormFicha from './form-ficha';
 import FormOptions from './form-options';
+import SaImageWithFallback from "../components/sa-image-with-fallback"
 
 const HomeContent = () => {
   const [isSceneOpen, setIsSceneOpen] = useState(false)
@@ -54,7 +55,7 @@ const HomeContent = () => {
       setTimeout(function(){
         let el: any = document.getElementById('chat');
   
-        if (el) el.scrollTop = el.scrollHeight;
+        if (el) el.scrollTop = 0;
       },500)
     }
   }, [messages, isSceneOpen])
@@ -64,7 +65,7 @@ const HomeContent = () => {
       {windowSize && <div id='canvas' style={{position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: isCanvasOpen ? 9999999 : -1}}></div>}
       {gameData && currentMap && <>
         <Box width='100%' height='100vh' display='flex' justifyContent='space-between' flexDirection={'row'} alignItems={'flex-start'} overflow={'hidden'}>
-          <Box width='calc(100% - 300px)' height='100vh' position='relative' overflow='visible'>
+          <Box width='calc(100% - 240px)' height='100vh' position='relative' overflow='visible'>
             <Box width='100vw' height='100vh' position='relative' overflow='visible'>
               {gameData.map && currentMap && <Image src={`/scenes/${currentMap}.webp`} alt='' width={windowSize?.width} height={windowSize?.height} style={{width: '100%', height: '100%', objectFit:'cover', pointerEvents: 'none' }}/>}
               {gameData.map && gameData.maps[currentMap].effect && renderVideo(`/effects/${gameData.maps[currentMap].effect}.webm`, videoRef)}
@@ -76,7 +77,7 @@ const HomeContent = () => {
                 <Typography variant="h1" color='#FFF' component="h1">{gameData.maps[currentMap].title}</Typography>
                 <Typography color='#FFF' fontSize={'1.2rem'}>{gameData.maps[currentMap].subtitle}</Typography>  
               </Box>
-              <Box sx={styles.menu}>
+              <Box sx={[styles.menu, isSceneOpen ? styles.menuItemBlack : {}]}>
                 {(gameData.map.scene_visible || userData.type === 'gm') && gameData.maps[currentMap].active_scene && 
                 <Box onClick={() => {if (!isSceneOpen) setIsSheetOpen(false); setIsSceneOpen(!isSceneOpen) }} sx={[styles.menuItem]}>
                   <SaIcon name='map' theme='paper' size={30} style={styles.menuItemIcon} />
@@ -90,38 +91,89 @@ const HomeContent = () => {
               </Box>
             </Box>
           </Box>
-          <Box width='300px' height='100%' padding={'30px'} position='relative' zIndex={999998}>
-            {(gameData.map.scene_visible || userData.type === 'gm') && isSceneOpen && <Box style={{backgroundColor: 'rgba(0,0,0,0.4)', overflowY: 'auto'}} width='100%' height='100%' id='chat'>
-              <Box flex={1} display='flex' flexDirection='column' padding='20px' minHeight='100%' justifyContent={'flex-end'} gap={'20px'}>
+          {(gameData.map.scene_visible || userData.type === 'gm') && isSceneOpen && <Box width='240px' height='calc(100% - 105px)' marginTop={'105px'} position='relative' zIndex={999998}>
+            <Box style={{backgroundColor: 'rgba(0,0,0,0.4)', overflowY: 'auto'}} width='100%' height='100%' id='chat'>
+              <Box flex={1} display='flex' flexDirection='column-reverse' padding='20px' minHeight='100%' justifyContent={'flex-end'} gap={'20px'}>
               {messages.map((item, index) => {
                 const dices = item.result ? item.result.split(',') : []
+                let sum = 0;
+                let bonus = 0;
+                if (item.message == undefined){
+                  item.message = '';
+                }
+                let pieces = item.message.indexOf('\\') > -1 ? item.message.split('\\') : [item.message];
                 return (
-                  <Box key={index} bgcolor='#000' padding='20px' textAlign={'center'} style={{border: index === messages.length - 1 ? 'solid 2px #1d981d' : ''}}>
-                    {item.date !== undefined && <Typography textAlign='center' marginTop={'-5px'} marginBottom={'5px'} color='rgba(255,255,255,0.2)' fontWeight={500} fontSize={'0.6rem'}>{item.date}</Typography>}
-                    {item.token !== undefined && <Typography color='#FFF' fontWeight={700} fontSize={'1rem'}>{item.token}</Typography>}
-                    {item.message !== undefined && <Typography color='#FFF' fontWeight={500} fontSize={'0.8rem'}>{item.message}</Typography>}
-                    {dices && <Box display={'flex'} flexWrap={'wrap'} justifyContent={'center'} gap={'10px'} marginTop={'15px'} paddingTop={'20px'} borderTop={'solid 1px #FFF'}>
+                  <Box key={index} bgcolor='#000' padding='20px' textAlign={'center'} sx={[styles.messages, index === messages.length - 1 ? {border: 'solid 2px #1d981d', opacity: '1'} : {}]}>
+                    {item.date !== undefined && <Typography textAlign='center' marginTop={'-5px'} marginBottom={'5px'} color='rgba(255,255,255,0.6)' fontWeight={500} fontSize={'0.6rem'}>{item.date}</Typography>}
+                    {item.token !== undefined && <Typography color='#ffc107' fontWeight={700} fontSize={'1rem'}>{tokens[item.token].name}</Typography>}
+                    {item.token && item.target && <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+                    <SaImageWithFallback
+                      fallback={`/tokens/default.png`} 
+                      src={`/tokens/${item.token.replace(/_copy/g, "")}.png`} 
+                      alt='' 
+                      width={40} 
+                      height={40}
+                    />
+                    <Typography color='#FFF' fontWeight={700} fontSize={'2rem'}>⇨</Typography>
+                    <SaImageWithFallback
+                      fallback={`/tokens/default.png`} 
+                      src={`/tokens/${item.target.replace(/_copy/g, "")}.png`} 
+                      alt='' 
+                      width={40} 
+                      height={40}
+                    />
+                    </Box>}
+                    {pieces.map((item, index) => {
+                      return (
+                        <Typography sx={index > 0 ? [{marginTop: '5px'}] : []} color={index === 0 ? '#ffc107' : '#FFF'} fontWeight={500} fontSize={'0.8rem'}>{item}</Typography>
+                      )
+                    })}
+                    {dices && <Box display={'flex'} flexWrap={'wrap'} justifyContent={'center'} gap={'10px'} marginTop={'15px'}>
                       {dices.map((item, index) => {
                         item = item.split('|')
                         let max = item[0].replace('d','')
                         if (max == 10 && item[1] == 0){
                           item[1] = 10
                         }
+                        sum += parseInt(item[1]);
                         return (
-                          <Box key={index} color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'30px'} textAlign={'center'}>
-                            <Typography textAlign={'center'} color={item[1] == max ? '#23ba23' : (item[1] == 1 ? 'red' : 'white')}>{item[1]}</Typography>
-                            <Typography fontSize={'0.8rem'}>{item[0]}</Typography>
-                          </Box>
+                          <>
+                            {index > 0 && <Box color={'#FFF'} alignSelf='center'><Typography fontSize={'1.2rem'}>+</Typography></Box>}
+                            <Box key={index} color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
+                              <Typography textAlign={'center'} color={item[1] == max ? '#23ba23' : (item[1] == 1 ? 'red' : 'white')}>{item[1]}</Typography>
+                              <Typography fontSize={'0.8rem'}>{item[0]}</Typography>
+                            </Box>
+                          </>
                         )
-                      })}  
+                      })}
+                      {item.damage && <>
+                        {dices.length > 0 && <Box color={'#FFF'} alignSelf='center'><Typography fontSize={'1.2rem'}>+</Typography></Box>}
+                        <Box color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
+                          <Typography textAlign={'center'} color={'white'}>{item.damage}</Typography>
+                          <Typography fontSize={'0.8rem'}>fixo</Typography>
+                        </Box>
+                      </>}
+                      {item.bonus && item.shield && <>
+                        <Box color={'#FFF'} alignSelf='center'><Typography fontSize={'1.2rem'}>+</Typography></Box>
+                        <Box color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
+                          <Typography textAlign={'center'} color={'white'}>{Math.ceil((sum + (item.damage ? parseInt(item.damage) : 0)) * ((parseInt(item.bonus) + parseInt(item.shield)) / 10))}</Typography>
+                          <Typography fontSize={'0.8rem'}>{10 * (parseInt(item.bonus) + parseInt(item.shield))}%</Typography>
+                        </Box>
+                      </>}
+                      {(dices.length > 0 || item.damage) && <>
+                        <Box color={'#FFF'} alignSelf='center'><Typography fontSize={'1.2rem'}>=</Typography></Box>
+                        <Box alignItems={'center'} justifyContent={'center'} color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
+                          <Typography textAlign={'center'} color={'#23ba23'}>{sum + parseInt(item.damage ? item.damage : 0) + (item.bonus && item.shield ? Math.ceil((sum + (item.damage ? parseInt(item.damage) : 0)) * ((parseInt(item.bonus) + parseInt(item.shield)) / 10)) : 0)}</Typography>
+                          <Typography fontSize={'0.8rem'}>dano</Typography>
+                        </Box>
+                      </>}
                     </Box>}
-                    
                   </Box>
                 )
               })}
               </Box>
-            </Box>}
-          </Box>
+            </Box>
+          </Box>}
         </Box>
         {(gameData.map.scene_visible || userData.type === 'gm') && gameData.maps[currentMap].active_scene && <SaModal getCanvasOpen={(open: boolean) => {setIsCanvasOpen(open)}} doom={gameData.map.doom_enabled && gameData.map.doom} isOpen={isSceneOpen} getIsOpen={setIsSceneOpen} bg={`/scenes/${currentMap}_${gameData.maps[currentMap].active_scene}.webp`} title={gameData.maps[currentMap].scenes[gameData.maps[currentMap].active_scene].name} size={gameData.maps[currentMap].scenes[gameData.maps[currentMap].active_scene].size}>
           {gameData.map && gameData.maps[currentMap].scenes[gameData.maps[currentMap].active_scene].effect && renderVideo(`/effects/${gameData.maps[currentMap].scenes[gameData.maps[currentMap].active_scene].effect}.webm`, videoRef2)}
@@ -147,11 +199,11 @@ const styles = {
     position: 'absolute',
     top: 0,
     right: 0,
-    padding: '30px 30px 30px 0',
-    height: '100%',
+    padding: '30px',
+    width: '240px',
     zIndex: 999999,
     display: 'flex',
-    flexDirection: 'column',
+    justifyContent: 'center',
     gap: '15px'
   },
   bannerContainer: {
@@ -175,6 +227,12 @@ const styles = {
       opacity: 0.8
     }
   },
+  menuItemBlack: {
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    '& > div': {
+      backgroundColor: '#000'
+    }
+  },
   menuItemIcon: {
     marginTop: 2
   },
@@ -186,6 +244,13 @@ const styles = {
     width: '100%',
     textShadow: '2px -2px 5px #000',
     background: 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)'
+  },
+  messages: {
+    opacity: 0.6,
+    transition: 'all 300ms',
+    '&:hover': {
+      opacity: 1
+    }
   }
 }
 

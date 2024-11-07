@@ -14,9 +14,8 @@ type FormProps = {
 const FormFicha = (props: FormProps) => {
   const {userTokenData, updateToken} = useApp()
 
-  const [complications, setComplications] = useState<string[]>(['Ferimento','Sangramento','','','','','',''])
   const [macros, setMacros] = useState<string[]>(['','','','',''])
-  const [itens, setItens] = useState<string[]>(['skill=Poção de Vida (ação)|desc=Recupera 15 pontos de vida.:::5','skill=Amuleto da Sorte (ação)|desc=Recupera 5 pontos de protagonismo.:::1','','',''])
+  const [itens, setItens] = useState<string[]>(['nome=Poção de Vida (ação)|desc=Recupera 15 pontos de vida.:::5','nome=Amuleto da Sorte (ação)|desc=Recupera 5 pontos de protagonismo.:::1','','',''])
   const [others, setOthers] = useState<string[]>(['','','','',''])
   const [canShowLoop, setCanShowLoop] = useState(false)
   
@@ -25,16 +24,12 @@ const FormFicha = (props: FormProps) => {
 
   useEffect(() => {
     if (userTokenData){
-      if (userTokenData.complications){
-        setComplications(userTokenData.complications)
-      }
-      
       if (userTokenData.macros){
         setMacros(userTokenData.macros)
       }
 
-      if (userTokenData.itens){
-        setItens(userTokenData.itens)
+      if (userTokenData.items){
+        setItens(userTokenData.items)
       }
 
       if (userTokenData.others){
@@ -97,11 +92,12 @@ const FormFicha = (props: FormProps) => {
 
   const dice_data = [
     {value: '', label: '-'},
-    {value: 'd4', label: 'D4'},
-    {value: 'd6', label: 'D6'},
-    {value: 'd8', label: 'D8'},
-    {value: 'd10', label: 'D10'},
-    {value: 'd12', label: 'D12'},
+    {value: '1d4', label: '1D4'},
+    {value: '2d4', label: '2D4'},
+    {value: '1d6', label: '1D6'},
+    {value: '2d6', label: '2D6'},
+    {value: '1d8', label: '1D8'},
+    {value: '2d8', label: '2D8'},
   ]
 
   const mv_al_data = [
@@ -121,10 +117,10 @@ const FormFicha = (props: FormProps) => {
   ]
 
   const difficulty = [
-    {value: '1', label: 'Fácil'},
-    {value: '2', label: 'Médio'},
-    {value: '3', label: 'Difícil'},
-    {value: '4', label: 'Expert'}
+    {value: '1', label: 'Fácil = Bônus de 10% + (DEF * 10)%'},
+    {value: '2', label: 'Médio = Bônus de 20% + (DEF * 10)%'},
+    {value: '3', label: 'Difícil = Bônus de 30% + (DEF * 10)%'},
+    {value: '4', label: 'Expert = Bônus de 40% + (DEF * 10)%'}
   ]
 
   const pv_pm_max = [
@@ -226,7 +222,7 @@ const FormFicha = (props: FormProps) => {
           value={userTokenData?.attr?.al}
         />
       </Box>
-      <Typography component='h2' variant='h6' display='flex' justifyContent='space-between'>Habilidades <small style={{fontSize: '1rem', fontWeight: 'normal'}}>Macro = skill|desc|pp|dados|fixo|arma|proprio</small></Typography>
+      <Typography component='h2' variant='h6' display='flex' justifyContent='space-between'>Habilidades <small style={{fontSize: '1rem', fontWeight: 'normal'}}>Macro = nome|desc|pp|dados|fixo|arma|proprio|buff</small></Typography>
       {canShowLoop && macros.map((item, index) => {
         const comp = item.split(':::')
         return <Box display='flex' key={'m_'+index} flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
@@ -238,7 +234,7 @@ const FormFicha = (props: FormProps) => {
           />
         </Box>
       })}
-      <Typography component='h2' variant='h6' display='flex' justifyContent='space-between'>Consumíveis <small style={{fontSize: '1rem', fontWeight: 'normal'}}>Macro = skill|desc|pp|dados|fixo|arma|proprio</small></Typography>
+      <Typography component='h2' variant='h6' display='flex' justifyContent='space-between'>Consumíveis <small style={{fontSize: '1rem', fontWeight: 'normal'}}>Macro = nome|desc|pp|dados|fixo|arma|proprio|buff</small></Typography>
       {canShowLoop && itens.map((item, index) => {
         const comp = item.split(':::')
         return <Box display='flex' key={'i_'+index} flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>

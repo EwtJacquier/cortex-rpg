@@ -25,10 +25,13 @@ interface AppProps {
   updateCurrentMap?: (map: string, scene: string) => void;
   updateScene?: (sceneVisible: boolean, night: boolean, nigthScene: boolean) => void,
   updateDoom?: (doomEnabled: boolean, doom: string) => void,
-  sendMessage?: (token: any, message: string, dices: any, result: any, target?: any) => void;
+  sendMessage?: (token: any, message: string, dices: any, result: any, target?: any, damage?: any, shield?: any, bonus?: any, buff?: boolean, item?: boolean) => void;
   changeCurrentToken?: (token: string) => void,
   isSheetOpen?: boolean,
   setIsSheetOpen?: (open: boolean) => void,
+  audioContext?: any,
+  audioFiles?: string[],
+  updateItemQuantity?: (index: number, quantity: number) => void,
 }
 
 const AppContext = createContext<AppProps>({});
@@ -87,11 +90,17 @@ export const AppProvider = ({children}: any) => {
   const [userTokenData, setUserTokenData] = useState<any>()
   const [userTokens, setUserTokens] = useState<any>()
   const [userCurrentToken, setUserCurrentToken] = useState<any>()
+  const [audioContext, setAudioContext] = useState<any>();
+  const [audioFiles, setAudioFiles] = useState([ "keyboard.mp3", 'error.mp3', 'success.mp3', 'critical.mp3', 'hit.mp3', 'heal.mp3', 'dices.mp3' ]);
   const [newMessage, setNewMessage] = useState<any>()
   const [windowSize, setWindowSize] = useState({
     width: 0,
     height: 0,
   });
+
+  useEffect(() => {
+    setAudioContext(new window.AudioContext());
+  },[])
 
   useEffect(() => {
     if (newMessage){
@@ -262,14 +271,24 @@ export const AppProvider = ({children}: any) => {
     }
   }
 
+  const updateItemQuantity = (index: number, quantity: number ) => {
+    if (database.current && tokens && tokens[userCurrentToken] ){
+      let newObj = tokens[userCurrentToken].items
+
+      newObj[index] = newObj[index].split(':::')[0] + ':::' + quantity;
+
+      update(ref(database.current, 'tokens/'+userCurrentToken+'/items'), Object.assign({},newObj));
+    }
+  }
+
   const setAttr = (attr: 'pv'|'pm', slug : string, val: string|null) => {
-    if (database.current && tokens && tokens[slug] && val && parseInt(val) > -1){
+    if (database.current && tokens && tokens[slug] && val && !isNaN(val)){
       let newObj = tokens[slug].attr
 
-      if (val.trim().indexOf('+') === 0) {
+      console.log(val);
+
+      if (val.trim().indexOf('+') === 0 || val.trim().indexOf('-') === 0) {
         newObj[attr] = (parseInt(newObj[attr]) + parseInt(val)).toString();
-      } else if (val.trim().indexOf('-') === 0) {
-        newObj[attr] = (parseInt(newObj[attr]) - parseInt(val)).toString();
       } else {
         newObj[attr] = parseInt(val).toString();
       }
@@ -306,10 +325,8 @@ export const AppProvider = ({children}: any) => {
     }
   }
 
-  const sendMessage = (token: any, message: string, dices: any, result: any, target: any = null) => {
+  const sendMessage = (token: any, message: string, dices: any, result: any, target: any = null, damage: any = null, shield: any = null, bonus: any = null, buff: boolean = false, item: boolean = false) => {
     if (userData && user && users && database.current && message && token){
-      
-
       try{
         const time = new Date().getTime()
         const username = userData.name
@@ -335,6 +352,26 @@ export const AppProvider = ({children}: any) => {
 
         if (target) {
           obj.target = target;
+        }
+
+        if (damage){
+          obj.damage = damage;
+        }
+
+        if (shield){
+          obj.shield = shield;
+        }
+
+        if (bonus){
+          obj.bonus = bonus;
+        }
+
+        if (buff) {
+          obj.buff = true;
+        }
+
+        if (item) {
+          obj.item = true;
         }
 
         set(ref(database.current, 'chat/' + time), obj);
@@ -417,7 +454,10 @@ export const AppProvider = ({children}: any) => {
     changeCurrentToken,
     isSheetOpen,
     setIsSheetOpen,
-    setAttr
+    setAttr,
+    audioContext,
+    audioFiles,
+    updateItemQuantity
   };
 
   return (

@@ -9,21 +9,34 @@ import SaIcon from './sa-icon';
 
 type saMenuProps = {
   visible: boolean,
-  items: {text: string, action: () => void, icon?: string}[],
+  items: {text: string, action: () => void, icon?: string, submenu?: {text: string, action: () => void}[]}[],
   position: 'left' | 'center'
 }
 
 const SaMenu = (props: saMenuProps) => {
   return (
-    <Box sx={{position: 'absolute', backgroundColor: '#000', width: '120px', zIndex: 2, left: props.position === 'left' ? '80%' : '50%', top: '50%', transform: `translate(${props.position === 'center' ? '-50%' : '0'}, -50%)`, display: props.visible ? 'block' : 'none' }}>
+    <Box sx={{position: 'absolute', backgroundColor: '#000', width: '120px', zIndex: 2, left: props.position === 'left' ? '100%' : '50%', top: '50%', transform: `translate(${props.position === 'center' ? '-50%' : '0'}, -50%)`, display: props.visible ? 'block' : 'none' }}>
       <MenuList>
         {props.items.map((item, index) => {
           return (
-            <MenuItem key={index} onClick={item.action} sx={{'&:hover': {backgroundColor: 'rgba(255,255,255,0.2)'}}}>
+            <MenuItem className='menu-item' key={index} onClick={item.action} sx={{'&:hover': {backgroundColor: 'rgba(255,255,255,0.2)', '.submenu': {display: 'block !important'} }}}>
               {item.icon !== undefined && <ListItemIcon>
                 <SaIcon name={item.icon} size={16} />
               </ListItemIcon>}
-              <ListItemText><Typography color='#FFF' style={{fontWeight: '500'}} fontSize={18}>{item.text}</Typography></ListItemText>
+              <ListItemText><Typography color='#FFF' style={{fontWeight: '500'}} fontSize={18}>{item.text}{item.submenu && item.submenu.length > 0 ? ' >' : ''}</Typography></ListItemText>
+              {item.submenu && item.submenu.length > 0 && <>
+                <Box className='submenu' sx={{position: 'absolute', display: 'none', backgroundColor: '#000', width: '200px', zIndex: 2, left: props.position === 'left' ? '115px' : '50%', top: '50%', transform: `translate(${props.position === 'center' ? '-50%' : '0'}, -50%)` }}>
+                  <MenuList>
+                    {item.submenu.map((subitem, subindex) => {
+                      return (
+                        <MenuItem key={index + '_' + subindex} onClick={subitem.action} sx={{'&:hover': {backgroundColor: 'rgba(255,255,255,0.2)'}}}>
+                          <ListItemText><Typography color='#FFF' style={{fontWeight: '500'}} fontSize={18}>{subitem.text}</Typography></ListItemText>
+                        </MenuItem>
+                      )
+                    })}
+                  </MenuList>
+                </Box>
+              </>}
             </MenuItem>
           )
         })}
