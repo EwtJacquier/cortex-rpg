@@ -39,7 +39,7 @@ const SaModal = (props: saModalProps) => {
   const [wordToType, setWordToType] = useState('');
   const [typedLetters, setTypedLetters] = useState<string[]>([]);
   const [typeboxTimer, setTypeboxTimer] = useState<any>();
-  const [typeboxAvailableTime, setTypeboxAvailableTime] = useState(0);
+  const [typeboxAvailableTime, setTypeboxAvailableTime] = useState(1000);
   const [SFX, setSFX] = useState<any[]>([]);
   const [currentTokenSkills, setCurrentTokenSkills] = useState<any>({own: [], target: []});
   const [currentTokenItems, setCurrentTokenItems] = useState<any>({own: [], target: []});
@@ -211,6 +211,10 @@ const SaModal = (props: saModalProps) => {
   }, [typedLetters, typeboxTimer]);
 
   useEffect(() => {
+    if (typeboxAvailableTime === 1000) {
+      return;
+    }
+
     if (typeboxAvailableTime <= 0) {
       clearTimeout(typeboxTimer);
 
