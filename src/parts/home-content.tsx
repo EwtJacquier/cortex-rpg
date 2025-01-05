@@ -97,11 +97,14 @@ const HomeContent = () => {
               {messages.map((item, index) => {
                 const dices = item.result ? item.result.split(',') : []
                 let sum = 0;
-                let bonus = 0;
                 if (item.message == undefined){
                   item.message = '';
                 }
                 let pieces = item.message.indexOf('\\') > -1 ? item.message.split('\\') : [item.message];
+                let bonus = 0;
+                if (item.bonus && item.shield) {
+                  bonus = parseInt(item.bonus) * 3;
+                }
                 return (
                   <Box key={index} bgcolor='#000' padding='20px' textAlign={'center'} sx={[styles.messages, index === messages.length - 1 ? {border: 'solid 2px #1d981d', opacity: '1'} : {}]}>
                     {item.date !== undefined && <Typography textAlign='center' marginTop={'-5px'} marginBottom={'5px'} color='rgba(255,255,255,0.6)' fontWeight={500} fontSize={'0.6rem'}>{item.date}</Typography>}
@@ -125,7 +128,7 @@ const HomeContent = () => {
                     </Box>}
                     {pieces.map((item, index) => {
                       return (
-                        <Typography sx={index > 0 ? [{marginTop: '5px'}] : []} color={index === 0 ? '#ffc107' : '#FFF'} fontWeight={500} fontSize={'0.8rem'}>{item}</Typography>
+                        <Typography key={'piece_'+index} sx={index > 0 ? [{marginTop: '5px'}] : []} color={index === 0 ? '#ffc107' : '#FFF'} fontWeight={500} fontSize={'0.8rem'}>{item}</Typography>
                       )
                     })}
                     {dices && <Box display={'flex'} flexWrap={'wrap'} justifyContent={'center'} gap={'10px'} marginTop={'15px'}>
@@ -138,33 +141,33 @@ const HomeContent = () => {
                         sum += parseInt(item[1]);
                         return (
                           <>
-                            {index > 0 && <Box color={'#FFF'} alignSelf='center'><Typography fontSize={'1.2rem'}>+</Typography></Box>}
-                            <Box key={index} color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
+                            {index > 0 && <Box key={'plus_'+index} color={'#FFF'} alignSelf='center'><Typography fontSize={'1.2rem'}>+</Typography></Box>}
+                            <Box key={'dice_'+index} color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
                               <Typography textAlign={'center'} color={item[1] == max ? '#23ba23' : (item[1] == 1 ? 'red' : 'white')}>{item[1]}</Typography>
                               <Typography fontSize={'0.8rem'}>{item[0]}</Typography>
                             </Box>
                           </>
                         )
                       })}
-                      {item.damage && <>
+                      {item.damage && item.damage > 0 && <>
                         {dices.length > 0 && <Box color={'#FFF'} alignSelf='center'><Typography fontSize={'1.2rem'}>+</Typography></Box>}
                         <Box color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
                           <Typography textAlign={'center'} color={'white'}>{item.damage}</Typography>
                           <Typography fontSize={'0.8rem'}>fixo</Typography>
                         </Box>
                       </>}
-                      {item.bonus && item.shield && <>
+                      {bonus > 0 && <>
                         <Box color={'#FFF'} alignSelf='center'><Typography fontSize={'1.2rem'}>+</Typography></Box>
                         <Box color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
-                          <Typography textAlign={'center'} color={'white'}>{Math.ceil((sum + (item.damage ? parseInt(item.damage) : 0)) * ((parseInt(item.bonus) + parseInt(item.shield)) / 10))}</Typography>
-                          <Typography fontSize={'0.8rem'}>{10 * (parseInt(item.bonus) + parseInt(item.shield))}%</Typography>
+                          <Typography textAlign={'center'} color={'white'}>{ bonus }</Typography>
+                          <Typography fontSize={'0.8rem'}>bonus</Typography>
                         </Box>
                       </>}
                       {(dices.length > 0 || item.damage) && <>
                         <Box color={'#FFF'} alignSelf='center'><Typography fontSize={'1.2rem'}>=</Typography></Box>
                         <Box alignItems={'center'} justifyContent={'center'} color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
-                          <Typography textAlign={'center'} color={'#23ba23'}>{sum + parseInt(item.damage ? item.damage : 0) + (item.bonus && item.shield ? Math.ceil((sum + (item.damage ? parseInt(item.damage) : 0)) * ((parseInt(item.bonus) + parseInt(item.shield)) / 10)) : 0)}</Typography>
-                          <Typography fontSize={'0.8rem'}>dano</Typography>
+                          <Typography textAlign={'center'} color={'#23ba23'}>{sum + parseInt(item.damage ? item.damage : 0) + (bonus > 0 ? bonus : 0)}</Typography>
+                          <Typography fontSize={'0.8rem'}>total</Typography>
                         </Box>
                       </>}
                     </Box>}
@@ -203,7 +206,7 @@ const styles = {
     width: '240px',
     zIndex: 999999,
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     gap: '15px'
   },
   bannerContainer: {

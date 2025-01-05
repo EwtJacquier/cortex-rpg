@@ -29,6 +29,8 @@ const FormLogin = () => {
 
       (async() => {
         login(email, password).then((response) => {
+          localStorage.setItem('email', email);
+          localStorage.setItem('password', password);
           //router.push('/home')
         }).catch((error) => {
           setErrorMessage('Usuário ou senha inválidos')
@@ -37,6 +39,17 @@ const FormLogin = () => {
       })()
     }
   }
+
+  useEffect(() => {
+    const storedEmail = localStorage.getItem('email');
+    const storedPassword = localStorage.getItem('password');
+
+    if (storedEmail && storedPassword) {
+      setEmail(storedEmail);
+      setPassword(storedPassword);
+    }
+
+  }, []);
 
   useEffect(() => {
     if (userData){

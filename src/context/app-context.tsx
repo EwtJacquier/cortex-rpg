@@ -32,6 +32,7 @@ interface AppProps {
   audioContext?: any,
   audioFiles?: string[],
   updateItemQuantity?: (index: number, quantity: number) => void,
+  changeTerrain?: (index: number, terrain: string) => void,
 }
 
 const AppContext = createContext<AppProps>({});
@@ -406,6 +407,28 @@ export const AppProvider = ({children}: any) => {
     }
   }
 
+  const changeTerrain = (index: number, terrain: string) => {
+    if (database.current && gameData){
+      let active_scene = gameData.maps[gameData.map.current].scenes[gameData.maps[gameData.map.current].active_scene];
+
+      if ( ! active_scene.terrain ) {
+        active_scene.terrain = '0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0';
+      }
+
+      let new_terrain = active_scene.terrain.split(',');
+
+      console.log(new_terrain);
+
+      new_terrain[index] = terrain;
+
+      console.log(index, terrain, new_terrain[index]);
+
+      active_scene.terrain = new_terrain.join(',');
+
+      update(ref(database.current, 'game/maps/' + gameData.map.current + '/scenes/' + gameData.maps[gameData.map.current].active_scene), active_scene);
+    }
+  }
+
   const updateScene = (sceneVisible: boolean, night: boolean, nigthScene: boolean) => {
     if (database.current && userData && tokensRef.current){
       update(ref(database.current, 'game/map'), {
@@ -457,7 +480,8 @@ export const AppProvider = ({children}: any) => {
     setAttr,
     audioContext,
     audioFiles,
-    updateItemQuantity
+    updateItemQuantity,
+    changeTerrain
   };
 
   return (

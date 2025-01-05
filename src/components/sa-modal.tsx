@@ -27,7 +27,7 @@ type diceTypes = {
 }
 
 const SaModal = (props: saModalProps) => {
-  const {audioContext, audioFiles, windowSize, userData, sendMessage, duplicateMonsterToken, tokens, addPP, subtractPP, setAttr, deleteToken, gameData, userCurrentToken, updateToken, changeCurrentToken, setIsSheetOpen, userTokenData, messages, updateItemQuantity} = useApp()
+  const {audioContext, audioFiles, windowSize, userData, sendMessage, changeTerrain, duplicateMonsterToken, tokens, addPP, subtractPP, setAttr, deleteToken, gameData, userCurrentToken, updateToken, changeCurrentToken, setIsSheetOpen, userTokenData, messages, updateItemQuantity} = useApp()
   const [sceneTokens, setSceneTokens] = useState<any[]>([false])
   const [availableTokens, setAvailableTokens] = useState<any[]>([])
   const [activeTokenMenu, setActiveTokenMenu] = useState('')
@@ -48,11 +48,13 @@ const SaModal = (props: saModalProps) => {
   const generateRandomLetter = (dflevel: number) => {
     let alphabet = '⇦⇨⇧⇩'; // Easy
     
+    /*
     if (dflevel > 3)  {
       alphabet = '⇦⇨⇧⇩fdbzykx!@#$%+';
     } else if (dflevel >= 2) {
       alphabet = '⇦⇨⇧⇩abcdefgh';
     }
+      */
     
     // const alphabet = '⇦⇨⇧⇩abcdefgh'; // Medium
     // const alphabet = '⇦⇨⇧⇩!@#$%+;fdbzykx' // Hard
@@ -251,6 +253,8 @@ const SaModal = (props: saModalProps) => {
         else{
           sendMessage(userCurrentToken, 'Rolou dados', null, send)
         }
+
+        setDices({d4: 0, d6: 0, d8: 0, d10: 0, d12: 0, d20: 0});
         
       }
 
@@ -430,12 +434,15 @@ const SaModal = (props: saModalProps) => {
       
       let def = parseInt(tokens[slug].attr?.df)
 
-      let dif_count = 2 + def;
+      let dif_count = 3 + def;
 
-      switch (parseInt(userTokenData.attr.dif)){
+      console.log(def, dif_count);
+
+      switch (def){
         case 2: dif_count = 4 + def; break;
-        case 3: dif_count = 6 + def; break;
-        case 4: dif_count = 8 + def; break;
+        case 3: dif_count = 5 + def; break;
+        case 4: dif_count = 6 + def; break;
+        case 5: dif_count = 7 + def; break;
       }
 
       let newWord = '';
@@ -450,7 +457,7 @@ const SaModal = (props: saModalProps) => {
       },500);
     }
 
-    const useSkill = (slug : string, skill: any) => {
+    const useskill = (slug : string, skill: any) => {
       if ( ! userTokenData.attr.damage || ! userTokenData.attr.dices || ! tokens[slug].attr?.df || ! userTokenData.attr?.dif || ! tokens[slug].attr.df ){
         return;
       }
@@ -488,6 +495,8 @@ const SaModal = (props: saModalProps) => {
           toSend['damage'] += parseInt(userTokenData.attr.damage);
           dados = sumDicesByString(dados, userTokenData.attr.dices);
         }
+
+        console.log(dados);
       }
 
       if (skill.buff) {
@@ -510,7 +519,7 @@ const SaModal = (props: saModalProps) => {
       setActiveTokenMenu('');
 
       if ( skill.item || skill.buff ) {
-        if ( skill.dados ) {
+        if ( dados.d4 > 0 || dados.d6 > 0 || dados.d8 > 0 || dados.d10 > 0 || dados.d12 > 0 ) {
           playAudio(6, 0.5);
           setTimeout(function(){
             document.getElementById('roll')?.click()
@@ -521,14 +530,17 @@ const SaModal = (props: saModalProps) => {
         }
       }
       else if ( skill.arma || skill.fixo || skill.dados ) {
-        let def = parseInt(skill.buff ? userTokenData.attr.dif : tokens[slug].attr?.df)
+        let def = parseInt(tokens[slug].attr?.df)
 
-        let dif_count = 2 + def;
-  
-        switch (parseInt(userTokenData.attr.dif)){
+        let dif_count = 3 + def;
+
+        console.log(def);
+
+        switch (def){
           case 2: dif_count = 4 + def; break;
-          case 3: dif_count = 6 + def; break;
-          case 4: dif_count = 8 + def; break;
+          case 3: dif_count = 5 + def; break;
+          case 4: dif_count = 6 + def; break;
+          case 5: dif_count = 7 + def; break;
         }
   
         let newWord = '';
@@ -564,7 +576,7 @@ const SaModal = (props: saModalProps) => {
          
           currentTokenSkills.target.forEach(function(skill, index){
             habilities_submenu.submenu.push({
-              action: () => { useSkill( token.slug, skill ) },
+              action: () => { useskill( token.slug, skill ) },
               text: skill.nome,
             })
           })
@@ -580,7 +592,7 @@ const SaModal = (props: saModalProps) => {
   
           currentTokenItems.target.forEach(function(item, index){
             items_submenu.submenu.push({
-              action: () => { useSkill( token.slug, item ) },
+              action: () => { useskill( token.slug, item ) },
               text: item.nome + ' x' + item.qtd,
             })
           })
@@ -599,7 +611,7 @@ const SaModal = (props: saModalProps) => {
   
           currentTokenSkills.own.forEach(function(skill, index){
             support_submenu.submenu.push({
-              action: () => { useSkill( token.slug, skill ) },
+              action: () => { useskill( token.slug, skill ) },
               text: skill.nome,
             })
           })
@@ -615,7 +627,7 @@ const SaModal = (props: saModalProps) => {
   
           currentTokenItems.own.forEach(function(item, index){
             items_submenu.submenu.push({
-              action: () => { useSkill( token.slug, item ) },
+              action: () => { useskill( token.slug, item ) },
               text: item.nome + ' x' + item.qtd,
             })
           })
@@ -656,16 +668,16 @@ const SaModal = (props: saModalProps) => {
               }
             }}
           />
-          <Box className='tokenName' position={'absolute'} display='flex' flexDirection='column' justifyContent='center' alignItems='center' bgcolor='rgba(0,0,0,0.4)' padding='0 1rem 0.2rem 1rem' left={0} bottom={0} width='100%' sx={{opacity: 0, pointerEvents: 'none'}}>
-            <Typography textAlign={'center'} fontSize='1rem' color='#FFF' fontWeight={'600'}>{token.name}</Typography>
+          <Box className='tokenName' position={'absolute'} display='flex' flexDirection='column' justifyContent='center' alignItems='center' bgcolor='rgba(0,0,0,0.4)' padding='0.2rem 0.2rem 0.4rem 0.2rem' left={0} bottom={0} width='100%' sx={{opacity: 0, pointerEvents: 'none'}}>
+            <Typography textAlign={'center'} fontSize='0.8rem' color='#FFF' fontWeight={'600'} lineHeight={'1.2'}>{token.name}</Typography>
           </Box>
-          {width === '' && <Box position={'absolute'} display={'flex'} flexDirection={'column'} justifyContent={'space-between'} alignItems={'center'} gap={'5px'} left={'-2.7rem'} padding={'5px'} top={'50%'} style={{transform: 'translateY(-50%)'}}>
+          {width === '' && <Box position={'absolute'} display={'flex'} flexDirection={'column'} justifyContent={'space-between'} alignItems={'center'} gap={'5px'} left={'-2.9rem'} padding={'5px'} top={'50%'} style={{transform: 'translateY(-50%)'}}>
             {(token.slug === userCurrentToken || userData.type === 'gm') && token.attr?.pv && token.attr?.pvmax && <Typography onClick={() => {setAttr('pv',token.slug,prompt(`Modificar PV (Máx: ${token.attr.pvmax})`))}} sx={[styles.attribute, {backgroundColor: '#0e7f0e', cursor: 'pointer'}]}><Image src={`/images/hearts.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{token.attr.pv}</Typography>}
             {(token.slug === userCurrentToken || userData.type === 'gm') && token.attr?.pm && token.attr?.pmmax && <Typography onClick={() => {setAttr('pm',token.slug,prompt(`Modificar PP (Máx: ${token.attr.pmmax})`))}} sx={[styles.attribute, {backgroundColor: '#0f4dbc', cursor: 'pointer'}]}><Image src={`/images/allied-star.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{token.attr.pm}</Typography>}
             {(token.slug !== userCurrentToken && userData.type !== 'gm') && token.attr?.pv && token.attr?.pvmax && <Typography sx={[styles.attribute, {backgroundColor: '#0e7f0e'}]}><Image src={`/images/hearts.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{ Math.round((token.attr.pv / token.attr.pvmax) * 100) } %</Typography>}
             {(token.slug !== userCurrentToken && userData.type !== 'gm') && token.attr?.pm && token.attr?.pmmax && <Typography sx={[styles.attribute, {backgroundColor: '#0f4dbc'}]}><Image src={`/images/allied-star.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} /> ?</Typography>}
           </Box>}
-          {width === '' && (token.type === 'player' || userData.type === 'gm') && token.attr && <Box position={'absolute'} display={'flex'} flexDirection={'column'} justifyContent={'space-between'} alignItems={'center'} gap={'5px'} right={'-2.7rem'} padding={'5px'} top={'50%'} style={{transform: 'translateY(-50%)'}}>
+          {width === '' && (token.type === 'player' || userData.type === 'gm') && token.attr && <Box position={'absolute'} display={'flex'} flexDirection={'column'} justifyContent={'space-between'} alignItems={'center'} gap={'5px'} right={'-2.9rem'} padding={'5px'} top={'50%'} style={{transform: 'translateY(-50%)'}}>
             {token.attr?.mv && <Typography sx={styles.attribute}><Image src={`/images/footprint.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{token.attr.mv}</Typography>}
             {token.attr?.al && <Typography sx={styles.attribute}><Image src={`/images/targeted.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{token.attr.al}</Typography>}
             {token.attr?.df && <Typography sx={styles.attribute}><Image src={`/images/checked-shield.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{token.attr.df}</Typography>}
@@ -763,8 +775,29 @@ const SaModal = (props: saModalProps) => {
             <Box width={'100%'}>
               <Box sx={[styles.battleGrid]}>
                 {tokens && gameData && Array.from(Array(25).keys()).map((item: number, index: number) => {
+                  let bgStyle = {backgroundColor: 'rgba(0,0,0,0.2)'};
+                  const active_scene = gameData.maps[gameData.map.current].scenes[gameData.maps[gameData.map.current].active_scene];
+                  if (active_scene.terrain) {
+                    let terrain = active_scene.terrain.split(',');
+
+                    if (terrain.length === 25 && parseInt(terrain[index]) > 0){
+                      switch (parseInt(terrain[index])){
+                        case 1: bgStyle.backgroundColor = '#000'; break;
+                        case 2: bgStyle = styles.iceTerrain; break;
+                        case 3: bgStyle = styles.fireTerrain; break;
+                      }
+
+                      bgStyle.backgroundColor += ' !important';
+                    }
+                  }
                   return (
-                    <Box aria-valuenow={index} border='solid 2px rgba(0,0,0,0.2)' sx={[{backgroundColor: 'rgba(0,0,0,0.2)'}]} display='flex' gap='60px' justifyContent='center' alignItems='center' key={index} position='relative' className="droptarget" onDragOver={(event) => {event.preventDefault()}} onDragLeave={(event) => {event.target.classList.remove('hover')}} onDragEnter={(event) => {event.target.classList.add('hover')}} onDrop={(event) => {event.target.classList.remove('hover'); dropToken(event.dataTransfer.getData('text/plain'), event.target.ariaValueNow)}}>
+                    <Box aria-valuenow={index} border='solid 2px rgba(0,0,0,0.2)' sx={[bgStyle, {'&:not(.hover):hover .terrain': {display: 'flex !important'}}]} display='flex' gap='60px' justifyContent='center' alignItems='center' key={index} position='relative' className="droptarget" onDragOver={(event) => {event.preventDefault()}} onDragLeave={(event) => {event.target.classList.remove('hover')}} onDragEnter={(event) => {event.target.classList.add('hover')}} onDrop={(event) => {event.target.classList.remove('hover'); dropToken(event.dataTransfer.getData('text/plain'), event.target.ariaValueNow)}}>
+                      {userData.type === 'gm' && <Box className='terrain' position={'absolute'} left='0' bottom='0' display={'none'} width={'100%'} height='100%' justifyContent={'center'} flexDirection={'column'} gap={'2px'} alignItems={'flex-end'} >
+                        <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '0'); }}>0</button>
+                        <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '1'); }}>1</button>
+                        <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '2'); }}>2</button>
+                        <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '3'); }}>3</button>
+                      </Box>}
                       {sceneTokens.filter((token, idx) => token.position === index).map((token, idx) => {
                         return renderToken(token, index+'_'+idx)
                       })}
@@ -857,13 +890,13 @@ const styles = {
   attribute: {
     color: '#FFF',
     backgroundColor: '#000',
-    minWidth: '2.2rem',
+    minWidth: '2.4rem',
     textAlign: 'center',
     fontSize: '0.8rem',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '0 0.3rem',
+    gap: '0 0.2rem',
     '& b':{
       fontWeight: '700',
       fontSize: '0.8rem',
@@ -929,6 +962,18 @@ const styles = {
     width: '100%',
     gridTemplateColumns: 'repeat(5, 1fr)',
     gridTemplateRows: 'repeat(5, 1fr)'
+  },
+  terrainButton: {
+    color: '#FFF', backgroundColor: '#000', outline: 'none', border: 'none', minWidth: '30px', fontSize: '0.6rem', cursor: 'pointer'
+  },
+  iceTerrain: {
+    background: 'transparent url(/images/ice.jpg) no-repeat !important',
+    backgroundSize: '100% 100% !important'
+  },
+  fireTerrain: {
+    backgroundImage: 'url(/images/fire.png)',
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: '100% 100% !important'
   },
   diceInput: {width: '45px', outline: 'none', border: 'none', color: '#FFF', backgroundColor: 'rgba(0,0,0,0.6)', textAlign: 'center', paddingBottom: '5px', paddingTop: '7px', fontSize: '0.8rem'}
 }

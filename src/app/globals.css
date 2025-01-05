@@ -215,6 +215,10 @@ background: #3b3b41;
 .heal .tokenSFX::after {
     transform: rotate(45deg);    
 }
+
+[role="presentation"] {
+    z-index: 999999 !important;
+}
   
 
 @keyframes heal {

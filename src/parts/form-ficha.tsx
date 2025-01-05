@@ -15,7 +15,7 @@ const FormFicha = (props: FormProps) => {
   const {userTokenData, updateToken} = useApp()
 
   const [macros, setMacros] = useState<string[]>(['','','','',''])
-  const [itens, setItens] = useState<string[]>(['nome=Poção de Vida (ação)|desc=Recupera 15 pontos de vida.:::5','nome=Amuleto da Sorte (ação)|desc=Recupera 5 pontos de protagonismo.:::1','','',''])
+  const [itens, setItens] = useState<string[]>(['nome=Poção de Vida (ação)|desc=Recupera 15 pontos de vida.|fixo=10|buff:::5','nome=Fragmento de Cristal (ação)|desc=Recupera 5 pontos de poder.|fixo=5|buff:::1','','',''])
   const [others, setOthers] = useState<string[]>(['','','','',''])
   const [canShowLoop, setCanShowLoop] = useState(false)
   
@@ -117,10 +117,11 @@ const FormFicha = (props: FormProps) => {
   ]
 
   const difficulty = [
-    {value: '1', label: 'Fácil = Bônus de 10% + (DEF * 10)%'},
-    {value: '2', label: 'Médio = Bônus de 20% + (DEF * 10)%'},
-    {value: '3', label: 'Difícil = Bônus de 30% + (DEF * 10)%'},
-    {value: '4', label: 'Expert = Bônus de 40% + (DEF * 10)%'}
+    {value: '1', label: 'Novato, Nível 1, Bônus + 3'},
+    {value: '2', label: 'Experiente, Nível 2, Bônus + 6'},
+    {value: '3', label: 'Veterano, Nível 3, Bônus + 9'},
+    {value: '4', label: 'Especialista, Nível 4, Bônus + 12'},
+    {value: '5', label: 'Lendário, Nível 5, Bônus + 15'},
   ]
 
   const pv_pm_max = [
@@ -139,6 +140,15 @@ const FormFicha = (props: FormProps) => {
     {errorMessage && <SaMessage type='error' message={errorMessage} onClose={() => {setErrorMessage('')}} />}
     {userTokenData && <Typography component='h2' variant='h4'>Ficha de Personagem - {userTokenData.name}</Typography>}
     <form style={styles.container} onSubmit={onSubmit}>
+      <Box marginTop={'10px'} display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
+        <SaInput
+          select={true}
+          items={difficulty}
+          label='Nível do Herói'
+          name='attr_dif'
+          value={userTokenData?.attr?.dif}
+        />
+      </Box>
       <Box marginTop={'10px'} display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
         <SaInput
           type='number'
@@ -165,15 +175,6 @@ const FormFicha = (props: FormProps) => {
           label='PP Máximo'
           name='attr_pmmax'
           value={userTokenData?.attr?.pmmax}
-        />
-      </Box>
-      <Box marginTop={'10px'} display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
-        <SaInput
-          select={true}
-          items={difficulty}
-          label='Dificuldade do Minigame'
-          name='attr_dif'
-          value={userTokenData?.attr?.dif}
         />
       </Box>
       <Typography component='h2' variant='h6' display='flex' justifyContent='space-between'>Atributos</Typography>
