@@ -25,7 +25,7 @@ interface AppProps {
   updateCurrentMap?: (map: string, scene: string) => void;
   updateScene?: (sceneVisible: boolean, night: boolean, nigthScene: boolean) => void,
   updateDoom?: (doomEnabled: boolean, doom: string) => void,
-  sendMessage?: (token: any, message: string, dices: any, result: any, target?: any, damage?: any, shield?: any, bonus?: any, buff?: boolean, item?: boolean) => void;
+  sendMessage?: (token: any, message: string, dices: any, firstResult: any, secondResult: any, target?: any, damage?: any, shield?: any, bonus?: any, buff?: boolean, item?: boolean, effect?: any, dices2?: any, message2?: string) => void;
   changeCurrentToken?: (token: string) => void,
   isSheetOpen?: boolean,
   setIsSheetOpen?: (open: boolean) => void,
@@ -326,7 +326,7 @@ export const AppProvider = ({children}: any) => {
     }
   }
 
-  const sendMessage = (token: any, message: string, dices: any, result: any, target: any = null, damage: any = null, shield: any = null, bonus: any = null, buff: boolean = false, item: boolean = false) => {
+  const sendMessage = (token: any, message: string, dices: any, firstResult: any, secondResult: any, target: any = null, damage: any = null, shield: any = null, bonus: any = null, buff: boolean = false, item: boolean = false, effect: number = 0, dices2: any = null, message2: string = '') => {
     if (userData && user && users && database.current && message && token){
       try{
         const time = new Date().getTime()
@@ -336,7 +336,8 @@ export const AppProvider = ({children}: any) => {
           message: message,
           author: user.uid,
           token: token,
-          result: result,
+          firstResult: firstResult,
+          secondResult: secondResult,
           date: BdMask.maskDate(new Date(), true),
           name: username
         }
@@ -373,6 +374,18 @@ export const AppProvider = ({children}: any) => {
 
         if (item) {
           obj.item = true;
+        }
+
+        if (effect) {
+          obj.effect = effect;
+        }
+
+        if (dices2) {
+          obj.dices2 = dices2;
+        }
+        
+        if (message2) {
+          obj.message2 = message2;
         }
 
         set(ref(database.current, 'chat/' + time), obj);

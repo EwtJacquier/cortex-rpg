@@ -32,9 +32,11 @@ const SaModal = (props: saModalProps) => {
   const [availableTokens, setAvailableTokens] = useState<any[]>([])
   const [activeTokenMenu, setActiveTokenMenu] = useState('')
   const [dices, setDices] = useState<any>({d4: 0, d6: 0, d8: 0, d10: 0, d12: 0, d20: 0})
-  const [messageToSend, setMessageToSend] = useState<{token: any, message: string, dices: any, target: any, damage?: any, bonus?: any, shield?: any, buff?: boolean, item?: boolean}>()
+  const [dices2, setDices2] = useState<any>({d4: 0, d6: 0, d8: 0, d10: 0, d12: 0, d20: 0})
+  const [messageToSend, setMessageToSend] = useState<{token: any, message: string, dices: any, target: any, dices2?: any, damage?: any, damage2?: any, message2?: string, bonus?: any, shield?: any, buff?: boolean, item?: boolean, effect?: number}>()
   const [nextActions, setNextActions] = useState()
   const [send, setSend] = useState<string>()
+  const [previousResult, setPreviousResult] = useState<string>()
   const [isTypeboxOpen, setIsTypeboxOpen] = useState(false);
   const [wordToType, setWordToType] = useState('');
   const [typedLetters, setTypedLetters] = useState<string[]>([]);
@@ -43,6 +45,7 @@ const SaModal = (props: saModalProps) => {
   const [SFX, setSFX] = useState<any[]>([]);
   const [currentTokenSkills, setCurrentTokenSkills] = useState<any>({own: [], target: []});
   const [currentTokenItems, setCurrentTokenItems] = useState<any>({own: [], target: []});
+  const [postRoll, setPostRoll] = useState<boolean>(false);
   const places = Array.from(Array(props.size).keys())
 
   const generateRandomLetter = (dflevel: number) => {
@@ -94,15 +97,15 @@ const SaModal = (props: saModalProps) => {
   
         if (wordToType.length === typedLetters.length + 1){
           clearTimeout(typeboxTimer);
-          setTypeboxAvailableTime(0);
-          clearWord();
-
-          playAudio(3, 0.1);
-
-          setMessageToSend({
-            ...messageToSend,
-            ...{bonus: userTokenData.attr.dif}
-          });
+          setTimeout(function(){
+            setTypeboxAvailableTime(0);
+            clearWord();
+            playAudio(3, 0.1);
+            setMessageToSend({
+              ...messageToSend,
+              ...{bonus: userTokenData.attr.dif}
+            });
+          },300); 
         }
       }
       else {
@@ -159,6 +162,43 @@ const SaModal = (props: saModalProps) => {
     if (messages && messages.length > 0 && messages[messages.length - 1].target ) {
       const is_buff = messages[messages.length - 1].buff;
       
+      let damage1 = 0;
+      let damage2 = 0;
+      
+      if ( messages[messages.length - 1].firstResult ) {
+        messages[messages.length - 1].firstResult.split(',').forEach((item) => {
+          item = item.split('|')
+          let max = item[0].replace('d','')
+          if (max == 10 && item[1] == 0){
+            item[1] = 10
+          }
+          damage1 += parseInt(item[1]);
+        });
+
+        if (messages[messages.length - 1].bonus && messages[messages.length - 1].shield) {
+          damage1 += parseInt(messages[messages.length - 1].bonus) * 3;
+        }
+      }
+
+      if (messages[messages.length - 1].damage) {
+        damage1 += parseInt(messages[messages.length - 1].damage);
+      }
+
+      if ( messages[messages.length - 1].secondResult ) {
+        messages[messages.length - 1].secondResult.split(',').forEach((item) => {
+          item = item.split('|')
+          let max = item[0].replace('d','')
+          if (max == 10 && item[1] == 0){
+            item[1] = 10
+          }
+          damage2 += parseInt(item[1]);
+        });
+
+        if (messages[messages.length - 1].damage2) {
+          damage2 += parseInt(messages[messages.length - 1].damage2);
+        }
+      }
+
       if (is_buff) {
         playAudio( 5 , 0.5);
       }
@@ -180,6 +220,28 @@ const SaModal = (props: saModalProps) => {
         setTimeout(function(){
           token.classList.remove(is_buff ? 'heal' : 'hurt')
         },500);
+
+        token.setAttribute('type', is_buff ? 'heal' : 'hurt');
+
+        setTimeout(function(){
+          token.removeAttribute('type');
+        },4000);
+
+        if (damage1) {
+          token.setAttribute('damage1', damage1.toString());
+
+          setTimeout(function(){
+            token.removeAttribute('damage1');
+          },4000);
+        }
+
+        if (damage2) {
+          token.setAttribute('damage2', '+' + damage2.toString());
+
+          setTimeout(function(){
+            token.removeAttribute('damage2');
+          },4000);
+        }
       }
     }
   }, [messages])
@@ -249,8 +311,26 @@ const SaModal = (props: saModalProps) => {
   useEffect(() => {
     if (typeof(send) !== 'undefined'){
       if (sendMessage){
+        if ( postRoll ) {
+          setPostRoll(false);
+          setPreviousResult(send);
+          define_dices(dices2.d4+'d4+'+dices2.d6+'d6+'+dices2.d8+'d8+'+dices2.d10+'d10+'+dices2.d12+'d12');
+          setTimeout(function() {
+            playAudio(6, 0.5);
+            setTimeout(function() {
+              document.getElementById('roll')?.click()
+            },300);
+          },800);
+          return;
+        } else {
+          setPreviousResult('');
+        }
+
         if (messageToSend){
-          sendMessage(messageToSend.token, messageToSend.message, messageToSend.dices, send, messageToSend.target, messageToSend.damage, messageToSend.shield, messageToSend.bonus, messageToSend.buff, messageToSend.item)
+          const firstResult = previousResult ? previousResult : send;
+          const secondResult = previousResult ? send : '';
+          
+          sendMessage(messageToSend.token, messageToSend.message, messageToSend.dices, firstResult, secondResult, messageToSend.target, messageToSend.damage, messageToSend.shield, messageToSend.bonus, messageToSend.buff, messageToSend.item, messageToSend.effect, messageToSend.dices2, messageToSend.message2)
   
           setMessageToSend(undefined)
         }
@@ -288,6 +368,7 @@ const SaModal = (props: saModalProps) => {
   };
 
   const diceResultEvent = (e: any) => {
+    console.log(dices, dices2);
     if (e.detail.message){
       setSend(e.detail.message)
     }
@@ -466,6 +547,11 @@ const SaModal = (props: saModalProps) => {
         return;
       }
 
+      const effects = {
+        fire: 3,
+        ice: 2
+      };
+
       const pp = skill.pp ? ` ( ${skill.pp} PP ) ` : '';
       const desc = skill.desc ? '\\' + skill.desc : '';
 
@@ -475,9 +561,21 @@ const SaModal = (props: saModalProps) => {
         target: slug,
         shield: tokens[slug].attr.df,
         damage: 0,
+        effect: skill.fx && typeof( effects[ skill.fx ] ) !== undefined ? effects[ skill.fx ] : '',
+        damage2: 0,
+        message2: skill.postmessage ? skill.postmessage : '',
       };
       
       let dados: any = {
+        d4: 0,
+        d6: 0,
+        d8: 0,
+        d10: 0,
+        d12: 0,
+        d20: 0
+      };
+
+      let dados2: any = {
         d4: 0,
         d6: 0,
         d8: 0,
@@ -491,12 +589,20 @@ const SaModal = (props: saModalProps) => {
       } 
       
       if (skill.fixo) {
-        toSend['damage'] += parseInt(skill.fixo);
+        toSend.damage += parseInt(skill.fixo);
+      }
+
+      if (skill.postroll) {
+        dados2 = sumDicesByString(dados2, skill.postroll);
+      }
+
+      if (skill.mensagem) {
+        toSend.message = skill.mensagem;
       }
 
       if (skill.arma) {
         for (let i = 0; i < parseInt(skill.arma); i++) {
-          toSend['damage'] += parseInt(userTokenData.attr.damage);
+          toSend.damage += parseInt(userTokenData.attr.damage);
           dados = sumDicesByString(dados, userTokenData.attr.dices);
         }
 
@@ -504,21 +610,27 @@ const SaModal = (props: saModalProps) => {
       }
 
       if (skill.buff) {
-        toSend['buff'] = true;
+        toSend.buff = true;
       }
 
       if (skill.item) {
         if (skill.qtd > 0 && updateItemQuantity){
           updateItemQuantity( skill.index, parseInt(skill.qtd) - 1 );
         }
-        toSend['item'] = true;
+        toSend.item = true;
       }
 
-      toSend['dices'] = dados;
+      toSend.dices = dados;
+      toSend.dices2 = dados2;
 
       setMessageToSend(toSend);
 
       setDices(dados);
+      setDices2(dados2);
+
+      if ( dados2.d4 > 0 || dados2.d6 > 0 || dados2.d8 > 0 || dados2.d10 > 0 || dados2.d12 > 0 ) {
+        setPostRoll(true);
+      }
 
       setActiveTokenMenu('');
 
@@ -853,7 +965,69 @@ const styles = {
     marginTop: '15px',
     maxWidth: '150px',
     transition: '300ms',
-    outline: 'solid 5px transparent'
+    outline: 'solid 5px transparent',
+    '& > div::before': {
+      content: '""',
+      background: 'black',
+      display: 'block',
+      position: 'absolute',
+      padding: '0.2em',
+      top: '0.5em',
+      left: '50%',
+      fontSize: '1.3em',
+      fontWeight: '600',
+      color: '#FFF',
+      transform: 'translateX(-50%)',
+      opacity: '0',
+      textAlign: 'center',
+    },
+    '& > div::after': {
+      content: '""',
+      background: 'black',
+      display: 'block',
+      position: 'absolute',
+      padding: '0.2em',
+      top: '0.5em',
+      left: '50%',
+      fontSize: '1em',
+      fontWeight: '600',
+      color: '#FFF',
+      transform: 'translateX(-50%)',
+      opacity: '0',
+      textAlign: 'center',
+    },
+    '& > div[damage1]::before': {
+      content: 'attr(damage1)',
+      top: '-1em',
+      opacity: '1',
+      transition: 'opacity 2000ms, top 2000ms',
+    },
+    '& > div[damage1][damage2]::before': {
+      transform: 'none',
+      right: '50%',
+      left: 'auto',
+    },
+    '& > div[damage2]::after': {
+      transform: 'none',
+      left: '50%',
+      marginLeft: '0.5em',
+      content: 'attr(damage2)',
+      top: '-1em',
+      opacity: '1',
+      transition: 'opacity 2000ms, top 2000ms',
+    },
+    '& > div[type="heal"]::before': {
+      backgroundColor: 'green',
+    },
+    '& > div[type="heal"]::after': {
+      backgroundColor: 'green',
+    },
+    '& > div[type="hurt"]::before': {
+      backgroundColor: 'red',
+    },
+    '& > div[type="hurt"]::after': {
+      backgroundColor: 'red',
+    },
   },
   card: {
     transition: 'all .6s ease',
@@ -971,7 +1145,7 @@ const styles = {
     color: '#FFF', backgroundColor: '#000', outline: 'none', border: 'none', minWidth: '30px', fontSize: '0.6rem', cursor: 'pointer'
   },
   iceTerrain: {
-    background: 'transparent url(/images/ice.jpg) no-repeat !important',
+    background: 'transparent url(/images/ice.png) no-repeat !important',
     backgroundSize: '100% 100% !important'
   },
   fireTerrain: {
