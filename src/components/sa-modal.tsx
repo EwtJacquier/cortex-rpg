@@ -211,6 +211,51 @@ const SaModal = (props: saModalProps) => {
           },150);
         },150);
       }
+
+      let actor = document.querySelector('.token__' + messages[messages.length - 1].token);
+
+      let phrase2 = '';
+      let phrase = '';
+
+      let shouts = ['Toma essa!', 'Minha vez!', 'Você não vai escapar!', 'Isso acaba aqui!'];
+
+      if ( messages[messages.length - 1].buff ) {
+        if ( messages[messages.length - 1].token === messages[messages.length - 1].target ) {
+          shouts = ['Não irei falhar!','Tudo sob controle!','Ainda não acabou!','Minha vez!'];
+        }
+        else {
+          shouts = ['Deixa comigo!','Não desista!','Vamos nessa!','Você consegue!'];
+        }
+      }
+
+      console.log(messages[messages.length - 1]);
+      
+      if (messages[messages.length - 1].message && messages[messages.length - 1].message.indexOf('PP') > -1) {
+        phrase = shouts[Math.floor(Math.random() * 4) + 1];
+        phrase2 = messages[messages.length - 1].message;
+        phrase2 = phrase2.replace('(ação)', '').replace('(suporte)', '').replace('(reação)', '').trim();
+        phrase2 = phrase2.indexOf('\\') > -1 ? phrase2.split('\\')[0].split('(')[0].trim() : phrase2;
+        phrase2 += '!';
+      }
+      else if (messages[messages.length - 1].message.indexOf('Atacou') > -1) {
+        phrase = shouts[Math.floor(Math.random() * 4) + 1];
+      }
+      else {
+        phrase = '';
+      }
+
+      if (actor && phrase) {
+        actor.setAttribute('phrase', phrase);
+        setTimeout(function(){
+          actor.removeAttribute('phrase');
+          if (phrase2) {
+            actor.setAttribute('phrase', phrase2);
+            setTimeout(function(){
+              actor.removeAttribute('phrase');
+            },3500);
+          }
+        },phrase2 ? 2000 : 4000);
+      }
       
       let token = document.querySelector('.token__' + messages[messages.length - 1].target + ' > div');
 
@@ -765,7 +810,7 @@ const SaModal = (props: saModalProps) => {
     }
 
     return (
-      <Box onDoubleClick={() => { if (userData.type === 'gm' && token.slug !== userCurrentToken && changeCurrentToken) { changeCurrentToken(token.slug); setActiveTokenMenu(''); } }} className={'token__'+token.slug} width={width ? width : '40%'} sx={[{aspectRatio: '1/1', zIndex: activeTokenMenu === token.slug ? 10 : 1 , ...styles.cardContainer}, width !== '' ? styles.cardNormal : {}]} key={index+'t'} onContextMenu={(event) => {event.preventDefault(); setActiveTokenMenu(token.slug)}} onClick={(event) => {event.stopPropagation()}}>
+      <Box onDoubleClick={() => { if (userData.type === 'gm' && token.slug !== userCurrentToken && changeCurrentToken) { changeCurrentToken(token.slug); setActiveTokenMenu(''); } }} className={'token__'+token.slug} width={width ? width : '35%'} sx={[{aspectRatio: '1/1', zIndex: activeTokenMenu === token.slug ? 10 : 1 , ...styles.cardContainer}, width !== '' ? styles.cardNormal : {}]} key={index+'t'} onContextMenu={(event) => {event.preventDefault(); setActiveTokenMenu(token.slug)}} onClick={(event) => {event.stopPropagation()}}>
         <Box width={'100%'} height='100%' sx={[styles.card, width !== '' ? styles.cardNormal : {}, token.slug === userCurrentToken ? styles.cardSelected : {}]} className={(userData.type === 'gm' || token.slug === userCurrentToken) ? 'draggable' : ''} >
           <Box className="tokenSFX" sx={[styles.tokenSFX]}></Box>
           <SaImageWithFallback
@@ -932,7 +977,7 @@ const SaModal = (props: saModalProps) => {
                     }
                   }
                   return (
-                    <Box aria-valuenow={index} border='solid 2px rgba(0,0,0,0.2)' sx={[bgStyle, tileStyle, {'&:not(.hover):hover .terrain': {display: 'flex !important'}}]} display='flex' gap='60px' justifyContent='center' alignItems='center' key={index} position='relative' className="droptarget" onDragOver={(event) => {event.preventDefault()}} onDragLeave={(event) => {event.target.classList.remove('hover')}} onDragEnter={(event) => {event.target.classList.add('hover')}} onDrop={(event) => {event.target.classList.remove('hover'); dropToken(event.dataTransfer.getData('text/plain'), event.target.ariaValueNow)}} dataTile={tileLetter + tileNumber}>
+                    <Box aria-valuenow={index} border='dashed 2px rgba(0,0,0,0.2)' sx={[bgStyle, tileStyle, {'&:not(.hover):hover .terrain': {display: 'flex !important'}}]} display='flex' gap='60px' justifyContent='center' alignItems='center' key={index} position='relative' className="droptarget" onDragOver={(event) => {event.preventDefault()}} onDragLeave={(event) => {event.target.classList.remove('hover')}} onDragEnter={(event) => {event.target.classList.add('hover')}} onDrop={(event) => {event.target.classList.remove('hover'); dropToken(event.dataTransfer.getData('text/plain'), event.target.ariaValueNow)}} dataTile={tileLetter + tileNumber}>
                       {userData.type === 'gm' && <Box className='terrain' position={'absolute'} left='0' bottom='0' display={'none'} width={'100%'} height='100%' justifyContent={'center'} flexDirection={'column'} gap={'2px'} alignItems={'flex-end'} >
                         <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '0'); }}>0</button>
                         <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '1'); }}>1</button>
@@ -990,7 +1035,42 @@ const styles = {
     marginTop: '15px',
     maxWidth: '150px',
     transition: '300ms',
+    position: 'relative',
     outline: 'solid 5px transparent',
+    '&::before': {
+      content: '""',
+      display: 'block',
+      position: 'absolute',
+      top: '80%',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      opacity: '0',
+      textAlign: 'center',
+      color: '#000',
+      backgroundColor: '#FFF',
+      padding: '0.3rem',
+      fontSize: '0.7rem',
+      whiteSpace: 'nowrap',
+      fontWeight: 'normal',
+      borderRadius: '5px',
+      boxShadow: '0 0 5px rgba(0,0,0,0.2)',
+      zIndex: '2',
+    },
+    '&::after': {
+      content: '""',
+      display: 'block',
+      position: 'absolute',
+      top: '80%',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      opacity: '0',
+      borderBottom: 'solid 0.5em #FFF',
+      borderLeft: 'solid 0.5em transparent',
+      borderTop: 'solid 0.5em transparent',
+      borderRight: 'solid 0.5em transparent',
+      zIndex: '2',
+      marginTop: '-0.9em'
+    },
     '& > div::before': {
       content: '""',
       background: 'black',
@@ -1020,6 +1100,22 @@ const styles = {
       transform: 'translateX(-50%)',
       opacity: '0',
       textAlign: 'center',
+    },
+    '&[phrase]::before': {
+      content: 'attr(phrase)',
+      top: '115%',
+      opacity: '1',
+      transition: 'opacity 1500ms, top 1500ms',
+    },
+    '&[phrase]::after': {
+      top: '115%',
+      opacity: '1',
+      transition: 'opacity 1500ms, top 1500ms',
+    },
+    '& > div[damage1][damage2]::before': {
+      transform: 'none',
+      right: '50%',
+      left: 'auto',
     },
     '& > div[damage1]::before': {
       content: 'attr(damage1)',

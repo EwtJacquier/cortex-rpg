@@ -219,7 +219,26 @@ background: #3b3b41;
 [role="presentation"] {
     z-index: 999999 !important;
 }
-  
+
+.tag {
+    padding: 0 0.2rem;
+    display: inline-block;
+    margin: 0 0.2rem;
+    font-weight: 600;
+    color: #FFF;
+}
+
+.tag-red {
+    background-color: #bf0101;
+}
+
+.tag-blue {
+    background-color: #0069ff;
+}
+
+.tag-purple {
+    background-color: #871db5;
+}
 
 @keyframes heal {
     0% {

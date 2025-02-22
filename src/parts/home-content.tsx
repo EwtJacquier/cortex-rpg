@@ -99,10 +99,11 @@ const HomeContent = () => {
                 const dices2 = item.secondResult ? item.secondResult.split(',') : []
                 let sum = 0;
                 let sum2 = 0;
-                if (item.message == undefined){
-                  item.message = '';
-                }
-                let pieces = item.message.indexOf('\\') > -1 ? item.message.split('\\') : [item.message];
+                let message = item.message == undefined ? '' : item.message;
+                message = message.replace('(ação)', '<span class="tag tag-red">A</span>');
+                message = message.replace('(suporte)', '<span class="tag tag-blue">S</span>');
+                message = message.replace('(reação)', '<span class="tag tag-purple">R</span>');
+                let pieces = message.indexOf('\\') > -1 ? message.split('\\') : [message];
                 let bonus = 0;
                 if (item.bonus && item.shield) {
                   bonus = parseInt(item.bonus) * 3;
@@ -130,7 +131,7 @@ const HomeContent = () => {
                     </Box>}
                     {pieces.map((item, index) => {
                       return (
-                        <Typography key={'piece_'+index} sx={index > 0 ? [{marginTop: '5px'}] : []} color={index === 0 ? '#ffc107' : '#FFF'} fontWeight={500} fontSize={'0.8rem'}>{item}</Typography>
+                        <Typography key={'piece_'+index} sx={index > 0 ? [{marginTop: '5px'}] : []} color={index === 0 ? '#ffc107' : '#FFF'} fontWeight={500} fontSize={'0.8rem'} dangerouslySetInnerHTML={{__html: item}}></Typography>
                       )
                     })}
                     {dices && <Box display={'flex'} flexWrap={'wrap'} justifyContent={'center'} gap={'10px'} marginTop={'15px'}>

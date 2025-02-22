@@ -28,9 +28,13 @@ const SaMenu = (props: saMenuProps) => {
                 <Box className='submenu' sx={{position: 'absolute', display: 'none', backgroundColor: '#000', width: '200px', zIndex: 2, left: props.position === 'left' ? '115px' : '50%', top: '50%', transform: `translate(${props.position === 'center' ? '-50%' : '0'}, -50%)` }}>
                   <MenuList>
                     {item.submenu.map((subitem, subindex) => {
+                      subitem.text = subitem.text.replace('(ação)', '<span class="tag tag-red">A</span>');
+                      subitem.text = subitem.text.replace('(suporte)', '<span class="tag tag-blue">S</span>');
+                      subitem.text = subitem.text.replace('(reação)', '<span class="tag tag-purple">R</span>');
+
                       return (
                         <MenuItem key={index + '_' + subindex} onClick={subitem.action} sx={{'&:hover': {backgroundColor: 'rgba(255,255,255,0.2)'}}}>
-                          <ListItemText><Typography color='#FFF' style={{fontWeight: '500'}} fontSize={18}>{subitem.text}</Typography></ListItemText>
+                          <ListItemText><Typography color='#FFF' style={{fontWeight: '500'}} fontSize={18} dangerouslySetInnerHTML={{__html: subitem.text}}></Typography></ListItemText>
                         </MenuItem>
                       )
                     })}
