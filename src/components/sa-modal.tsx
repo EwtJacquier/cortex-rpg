@@ -227,18 +227,16 @@ const SaModal = (props: saModalProps) => {
           shouts = ['Deixa comigo!','Não desista!','Vamos nessa!','Você consegue!'];
         }
       }
-
-      console.log(messages[messages.length - 1]);
       
       if (messages[messages.length - 1].message && messages[messages.length - 1].message.indexOf('PP') > -1) {
-        phrase = shouts[Math.floor(Math.random() * 4) + 1];
+        phrase = shouts[Math.floor(Math.random() * 4)];
         phrase2 = messages[messages.length - 1].message;
         phrase2 = phrase2.replace('(ação)', '').replace('(suporte)', '').replace('(reação)', '').trim();
         phrase2 = phrase2.indexOf('\\') > -1 ? phrase2.split('\\')[0].split('(')[0].trim() : phrase2;
         phrase2 += '!';
       }
       else if (messages[messages.length - 1].message.indexOf('Atacou') > -1) {
-        phrase = shouts[Math.floor(Math.random() * 4) + 1];
+        phrase = shouts[Math.floor(Math.random() * 4)];
       }
       else {
         phrase = '';
@@ -413,7 +411,6 @@ const SaModal = (props: saModalProps) => {
   };
 
   const diceResultEvent = (e: any) => {
-    console.log(dices, dices2);
     if (e.detail.message){
       setSend(e.detail.message)
     }
@@ -482,7 +479,6 @@ const SaModal = (props: saModalProps) => {
     }
 
     if (userTokenData.items) {
-      console.log(formatSkills(userTokenData.items, true));
       setCurrentTokenItems(formatSkills(userTokenData.items, true));
     }
   }
@@ -566,8 +562,6 @@ const SaModal = (props: saModalProps) => {
 
       let dif_count = 3 + def;
 
-      console.log(def, dif_count);
-
       switch (def){
         case 2: dif_count = 4 + def; break;
         case 3: dif_count = 5 + def; break;
@@ -650,8 +644,6 @@ const SaModal = (props: saModalProps) => {
           toSend.damage += parseInt(userTokenData.attr.damage);
           dados = sumDicesByString(dados, userTokenData.attr.dices);
         }
-
-        console.log(dados);
       }
 
       if (skill.buff) {
@@ -694,8 +686,6 @@ const SaModal = (props: saModalProps) => {
         let def = parseInt(tokens[slug].attr?.df)
 
         let dif_count = 3 + def;
-
-        console.log(def);
 
         switch (def){
           case 2: dif_count = 4 + def; break;
