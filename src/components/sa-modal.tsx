@@ -891,7 +891,32 @@ const SaModal = (props: saModalProps) => {
             <Box width={'100%'}>
               <Box sx={[styles.battleGrid]}>
                 {tokens && gameData && Array.from(Array(25).keys()).map((item: number, index: number) => {
-                  let bgStyle = {backgroundColor: 'rgba(0,0,0,0.2)'};
+                  const mapping = {
+                      A: [1, 2, 3, 4, 5],
+                      B: [6, 7, 8, 9, 10],
+                      C: [11, 12, 13, 14, 15],
+                      D: [16, 17, 18, 19, 20],
+                      E: [21, 22, 23, 24, 25]
+                  };
+
+                  let tileLetter = '-';
+                  
+                  for (const [letter, range] of Object.entries(mapping)) {
+                      if (range.includes(( index + 1 ))) {
+                          tileLetter = letter;
+                      }
+                  }
+
+                  let tileNumber = ( index + 1 ) % 5;
+
+                  if (tileNumber === 0){
+                    tileNumber = 5;
+                  }
+
+                  let bgStyle = {backgroundColor: 'rgba(0,0,0,0.2)', position: 'relative'};
+                  const tileStyle = {
+                    '&::after': {content: 'attr(datatile)', fontSize: '1em', position: 'absolute', top: '0', left: '0', padding: '0.2em', color: '#FFF', width: '1em', textAlign: 'center', backgroundColor: '#000', opacity: '0.4'},
+                  }
                   const active_scene = gameData.maps[gameData.map.current].scenes[gameData.maps[gameData.map.current].active_scene];
                   if (active_scene.terrain) {
                     let terrain = active_scene.terrain.split(',');
@@ -907,7 +932,7 @@ const SaModal = (props: saModalProps) => {
                     }
                   }
                   return (
-                    <Box aria-valuenow={index} border='solid 2px rgba(0,0,0,0.2)' sx={[bgStyle, {'&:not(.hover):hover .terrain': {display: 'flex !important'}}]} display='flex' gap='60px' justifyContent='center' alignItems='center' key={index} position='relative' className="droptarget" onDragOver={(event) => {event.preventDefault()}} onDragLeave={(event) => {event.target.classList.remove('hover')}} onDragEnter={(event) => {event.target.classList.add('hover')}} onDrop={(event) => {event.target.classList.remove('hover'); dropToken(event.dataTransfer.getData('text/plain'), event.target.ariaValueNow)}}>
+                    <Box aria-valuenow={index} border='solid 2px rgba(0,0,0,0.2)' sx={[bgStyle, tileStyle, {'&:not(.hover):hover .terrain': {display: 'flex !important'}}]} display='flex' gap='60px' justifyContent='center' alignItems='center' key={index} position='relative' className="droptarget" onDragOver={(event) => {event.preventDefault()}} onDragLeave={(event) => {event.target.classList.remove('hover')}} onDragEnter={(event) => {event.target.classList.add('hover')}} onDrop={(event) => {event.target.classList.remove('hover'); dropToken(event.dataTransfer.getData('text/plain'), event.target.ariaValueNow)}} dataTile={tileLetter + tileNumber}>
                       {userData.type === 'gm' && <Box className='terrain' position={'absolute'} left='0' bottom='0' display={'none'} width={'100%'} height='100%' justifyContent={'center'} flexDirection={'column'} gap={'2px'} alignItems={'flex-end'} >
                         <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '0'); }}>0</button>
                         <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '1'); }}>1</button>
