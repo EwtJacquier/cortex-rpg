@@ -201,12 +201,14 @@ const SaModal = (props: saModalProps) => {
       }
       else {
         playAudio( 4 , 0.5);
-        setTimeout(function(){
-          playAudio( 4 , 0.5);
+        if (messages[messages.length - 1].bonus) {
           setTimeout(function(){
             playAudio( 4 , 0.5);
+            setTimeout(function(){
+              playAudio( 4 , 0.5);
+            },150);
           },150);
-        },150);
+        } 
       }
 
       let actor = document.querySelector('.token__' + messages[messages.length - 1].token);
