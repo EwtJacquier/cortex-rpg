@@ -27,7 +27,7 @@ type diceTypes = {
 }
 
 const SaModal = (props: saModalProps) => {
-  const {audioContext, audioFiles, windowSize, userData, sendMessage, changeTerrain, duplicateMonsterToken, tokens, addPP, subtractPP, setAttr, deleteToken, gameData, userCurrentToken, updateToken, changeCurrentToken, setIsSheetOpen, userTokenData, messages, updateItemQuantity} = useApp()
+  const {audioContext, audioFiles, windowSize, userData, sendMessage, changeTerrain, duplicateMonsterToken, tokens, addPP, subtractPP, setAttr, deleteToken, gameData, userCurrentToken, updateToken, changeCurrentToken, setIsSheetOpen, userTokenData, messages, updateItemQuantity, isCardsOpen, setIsCardsOpen, userTokens} = useApp()
   const [sceneTokens, setSceneTokens] = useState<any[]>([false])
   const [availableTokens, setAvailableTokens] = useState<any[]>([])
   const [activeTokenMenu, setActiveTokenMenu] = useState('')
@@ -402,6 +402,9 @@ const SaModal = (props: saModalProps) => {
       if (tokensInSamePlace.length > 0){
         return;
       }
+    }
+    if (isCardsOpen && userData.type !== 'gm') {
+      setIsCardsOpen(false);
     }
     if (updateToken && !isNaN(parseInt(index))) updateToken({position: parseInt(index), scene: gameData.map.current + '_' + gameData.maps[gameData.map.current].active_scene}, slug)
   }
@@ -811,7 +814,7 @@ const SaModal = (props: saModalProps) => {
             height={500} 
             style={{width: '100%', height: '100%', cursor: 'pointer'}}
             onDragStart={(event) => {
-              if ((userData.type === 'gm' || token.slug === userCurrentToken)){
+              if ((userData.type === 'gm' || token.slug === userCurrentToken) || (userData.type === 'player' && userTokens && userTokens.indexOf(token.slug) > -1)){
                 event.dataTransfer.setData('text/plain', token.slug)
               }
               else{
@@ -866,11 +869,14 @@ const SaModal = (props: saModalProps) => {
     if (tokens && userCurrentToken && userData){
       const scene_key = gameData.map.current + '_' + gameData.maps[gameData.map.current].active_scene
 
+      console.log(userTokens);
+
+
       setSceneTokens(Object.values(tokens).filter((token: any, idx) => token.position !== undefined && token.scene !== undefined && token.scene === scene_key))
       setAvailableTokens(Object.values(tokens).filter((token: any, idx) => {
         return (userData.type === 'gm' && ((token.position === undefined || token.position < 0)))
         || 
-        (token.type === 'player' && (token.position === undefined || token.position < 0))
+        (token.type === 'player' && userTokens && userTokens.indexOf(token.slug) > -1 && (token.position === undefined || token.position < 0))
       }))
     }
   }, [tokens, gameData])
@@ -893,6 +899,15 @@ const SaModal = (props: saModalProps) => {
       })
     })
   }, [availableTokens])
+
+  let active_turn = gameData.turn ? gameData.turn : 'player';
+  let active_turn_text = 'Turno dos ';
+
+  switch (active_turn) {
+    case 'player': active_turn_text += 'Jogadores'; break;
+    case 'enemy': active_turn_text += 'Inimigos'; break;
+    default: active_turn_text += 'NPCs'; break;
+  }
 
   return (
     <>
@@ -922,7 +937,7 @@ const SaModal = (props: saModalProps) => {
               {props.doom.split(',').map((item: string, index: number)=><Typography key={index} color='#FFF' fontSize='1rem' fontWeight='bold' padding='0 5px' style={{backgroundColor: 'rgba(0,0,0,0.4)'}}>{item}</Typography>)}
             </Box>}
           </Box>}
-          <Box display='flex' flexDirection='row-reverse' position='absolute' left='0' top='0' width='100%' height='100%'>
+          <Box display='flex' flexDirection='row-reverse' position='absolute' left='0' top='0' width='100%' height='100%' className='game'>
             <Box width={'100%'}>
               <Box sx={[styles.battleGrid]}>
                 {tokens && gameData && Array.from(Array(25).keys()).map((item: number, index: number) => {
@@ -950,29 +965,39 @@ const SaModal = (props: saModalProps) => {
 
                   let bgStyle = {backgroundColor: 'rgba(0,0,0,0.2)', position: 'relative'};
                   const tileStyle = {
+                    '&:not([datadamage="0"])::before': {content: 'attr(datadamage)', whiteSpace: 'nowrap', fontSize: '0.8rem', position: 'absolute', bottom: '0', left: '50%', transform: 'translateX(-50%)', padding: '0.2em', color: '#FFF', textAlign: 'center', backgroundColor: '#000'},
                     '&::after': {content: 'attr(datatile)', fontSize: '1em', position: 'absolute', top: '0', left: '0', padding: '0.2em', color: '#FFF', width: '1em', textAlign: 'center', backgroundColor: '#000', opacity: '0.4'},
                   }
                   const active_scene = gameData.maps[gameData.map.current].scenes[gameData.maps[gameData.map.current].active_scene];
+                  let terrain_damage = 0;
                   if (active_scene.terrain) {
                     let terrain = active_scene.terrain.split(',');
+                    
+                    const terrain_data = terrain[index].split('|');
+                    const terrain_type = parseInt(terrain_data[0]);
+                    if (terrain_data[1]){
+                      terrain_damage = terrain_data[1];
+                    }
 
-                    if (terrain.length === 25 && parseInt(terrain[index]) > 0){
-                      switch (parseInt(terrain[index])){
+                    if (terrain.length === 25 && terrain_type > 0){
+                      switch (terrain_type){
                         case 1: bgStyle.backgroundColor = '#000'; break;
                         case 2: bgStyle = styles.iceTerrain; break;
                         case 3: bgStyle = styles.fireTerrain; break;
+                        case 4: bgStyle = styles.breachTerrain; break;
                       }
 
                       bgStyle.backgroundColor += ' !important';
                     }
                   }
                   return (
-                    <Box aria-valuenow={index} border='dashed 2px rgba(0,0,0,0.2)' sx={[bgStyle, tileStyle, {'&:not(.hover):hover .terrain': {display: 'flex !important'}}]} display='flex' gap='60px' justifyContent='center' alignItems='center' key={index} position='relative' className="droptarget" onDragOver={(event) => {event.preventDefault()}} onDragLeave={(event) => {event.target.classList.remove('hover')}} onDragEnter={(event) => {event.target.classList.add('hover')}} onDrop={(event) => {event.target.classList.remove('hover'); dropToken(event.dataTransfer.getData('text/plain'), event.target.ariaValueNow)}} dataTile={tileLetter + tileNumber}>
+                    <Box aria-valuenow={index} border='dashed 2px rgba(0,0,0,0.2)' sx={[bgStyle, tileStyle, {'&:not(.hover):hover .terrain': {display: 'flex !important'}}]} display='flex' gap='60px' justifyContent='center' alignItems='center' key={index} position='relative' className="droptarget" onDragOver={(event) => {event.preventDefault()}} onDragLeave={(event) => {event.target.classList.remove('hover')}} onDragEnter={(event) => {event.target.classList.add('hover')}} onDrop={(event) => {event.target.classList.remove('hover'); dropToken(event.dataTransfer.getData('text/plain'), event.target.ariaValueNow)}} dataTile={tileLetter + tileNumber} dataDamage={terrain_damage}>
                       {userData.type === 'gm' && <Box className='terrain' position={'absolute'} left='0' bottom='0' display={'none'} width={'100%'} height='100%' justifyContent={'center'} flexDirection={'column'} gap={'2px'} alignItems={'flex-end'} >
                         <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '0'); }}>0</button>
                         <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '1'); }}>1</button>
                         <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '2'); }}>2</button>
                         <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '3'); }}>3</button>
+                        <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '4'); }}>4</button>
                       </Box>}
                       {sceneTokens.filter((token, idx) => token.position === index).map((token, idx) => {
                         return renderToken(token, index+'_'+idx)
@@ -982,7 +1007,7 @@ const SaModal = (props: saModalProps) => {
                 }) }
               </Box>
             </Box>
-            <Box height={'100%'} width='150px' style={{backgroundColor: 'rgba(0,0,0,0.4)'}}>
+            <Box height={'100%'} width='150px' style={{backgroundColor: 'rgba(0,0,0,0.8)', position: 'absolute', left: (isCardsOpen ? '0px' : '-150px'), transition: 'left 300ms', zIndex: 999999999}}>
               <Box height={'100%'} style={{overflowY: 'auto', overflowX: 'hidden'}} >
                 <Box gap={'20px'} minHeight={1} aria-valuenow={-1} flex={1} className="droptarget" display='flex' flexDirection='column' justifyContent='center' alignItems='center' position='relative' onDragOver={(event) => {event.preventDefault()}} onDragLeave={(event) => {event.target.classList.remove('hover')}} onDragEnter={(event) => {event.target.classList.add('hover')}} onDrop={(event) => {event.target.classList.remove('hover'); dropToken(event.dataTransfer.getData('text/plain'), event.target.ariaValueNow)}}>
                   {availableTokens.map((token, idx) => {
@@ -992,15 +1017,18 @@ const SaModal = (props: saModalProps) => {
               </Box>
             </Box>
           </Box>
-          {userData && <Box position='fixed' zIndex={99999} padding='10px' left={'130px'} bottom={0} display='flex' justifyContent={'center'} alignItems='center' gap='15px' width={'calc(100% - 130px)'} bgcolor='rgba(0,0,0,0.4)'>
-            <input type="text" style={{visibility: 'hidden', position: 'absolute', zIndex: -1}} name="dice_result" id="dice_result"/>
-            {['d4','d6','d8','d10','d12'].map((item: any, index) => <Box display={'flex'} justifyContent={'space-between'}  key={index}>
-              <button style={styles.diceButton} onClick={() => { if (dices[item] > 0) setDices({...dices, [item]: dices[item] - 1}) }}>-</button>
-              <input type="text" readOnly name={item} value={dices[item] + ' ' + item} style={styles.diceInput} />
-              <button style={styles.diceButton} onClick={() => { if (dices[item] < 10) setDices({...dices, [item]: dices[item] + 1}) }}>+</button>
-            </Box>)}
-            <button onClick={() => {setDices({d4: 0, d6: 0, d8: 0, d10: 0, d12: 0})}} style={{...styles.diceButton, padding: '8px 15px', fontSize: '0.8rem' }}>Limpar</button>
-            <button onClick={() => {document.getElementById('roll')?.click()}} style={{...styles.diceButton, padding: '8px 15px', fontSize: '0.8rem' }}>Rolar</button>
+          {userData && <Box position='fixed' zIndex={99999} padding='10px' left={0} bottom={0} display='flex' justifyContent={'space-between'} alignItems='center' gap='15px' width={'100%'} bgcolor='rgba(0,0,0,0.4)'>
+            {active_turn && <Typography textAlign={'center'} fontSize='0.8rem' color='#FFF' sx={[{backgroundColor: '#000', padding: '0.5rem'}]} lineHeight={'1.2'}>{active_turn_text}</Typography>}
+            <Box display='flex' justifyContent={'space-between'} alignItems='center' gap='15px'>
+              <input type="text" style={{visibility: 'hidden', position: 'absolute', zIndex: -1}} name="dice_result" id="dice_result"/>
+              {['d4','d6','d8','d10','d12'].map((item: any, index) => <Box display={'flex'} justifyContent={'space-between'}  key={index}>
+                <button style={styles.diceButton} onClick={() => { if (dices[item] > 0) setDices({...dices, [item]: dices[item] - 1}) }}>-</button>
+                <input type="text" readOnly name={item} value={dices[item] + ' ' + item} style={styles.diceInput} />
+                <button style={styles.diceButton} onClick={() => { if (dices[item] < 10) setDices({...dices, [item]: dices[item] + 1}) }}>+</button>
+              </Box>)}
+              <button onClick={() => {setDices({d4: 0, d6: 0, d8: 0, d10: 0, d12: 0})}} style={{...styles.diceButton, padding: '8px 0.5rem', fontSize: '0.8rem' }}>Limpar</button>
+              <button onClick={() => {document.getElementById('roll')?.click()}} style={{...styles.diceButton, padding: '8px 0.5rem', fontSize: '0.8rem' }}>Rolar</button>
+            </Box>
           </Box>}
         </Box>
       </Modal>
@@ -1264,7 +1292,12 @@ const styles = {
     backgroundRepeat: 'no-repeat',
     backgroundSize: '100% 100% !important'
   },
-  diceInput: {width: '45px', outline: 'none', border: 'none', color: '#FFF', backgroundColor: 'rgba(0,0,0,0.6)', textAlign: 'center', paddingBottom: '5px', paddingTop: '7px', fontSize: '0.8rem'}
+  breachTerrain: {
+    backgroundImage: 'url(/images/breach.png)',
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: '100% 100% !important'
+  },
+  diceInput: {width: '2rem', outline: 'none', border: 'none', color: '#FFF', backgroundColor: 'rgba(0,0,0,0.6)', textAlign: 'center', paddingBottom: '5px', paddingTop: '7px', fontSize: '0.8rem'}
 }
 
 export default SaModal

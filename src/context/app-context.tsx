@@ -16,7 +16,7 @@ interface AppProps {
   userCurrentToken?: any;
   windowSize?: {width: number, height: number};
   login?: (user: string, password: string) => Promise<UserCredential | boolean>;
-  updateToken?: (data: userModel, token?: string) => void;
+  updateToken?: (data: userModel, token: string) => void;
   duplicateMonsterToken?: (slug: string) => void;
   deleteToken?: (slug: string) => void;
   addPP?: (slug: string) => void;
@@ -29,6 +29,8 @@ interface AppProps {
   changeCurrentToken?: (token: string) => void,
   isSheetOpen?: boolean,
   setIsSheetOpen?: (open: boolean) => void,
+  isCardsOpen?: boolean,
+  setIsCardsOpen?: (open: boolean) => void,
   audioContext?: any,
   audioFiles?: string[],
   updateItemQuantity?: (index: number, quantity: number) => void,
@@ -82,6 +84,7 @@ export const AppProvider = ({children}: any) => {
   const chatRef = useRef<DatabaseReference>() 
   
   const [isSheetOpen, setIsSheetOpen] = useState(false)
+  const [isCardsOpen, setIsCardsOpen] = useState(false)
   const [gameData, setGameData] = useState<any>()
   const [users, setUsers] = useState<any>()
   const [tokens, setTokens] = useState<any>()
@@ -123,21 +126,6 @@ export const AppProvider = ({children}: any) => {
     tokensRef.current = ref(database.current, 'tokens')
     chatRef.current = ref(database.current, 'chat')
     auth.current = getAuth(app)
-    
-    /*
-    onAuthStateChanged(auth.current, (user) => {
-      if (!user) {
-        
-      } else {
-        setUser(null)
-        setUserData(null)
-        setUserTokens(null)
-        setUserCurrentToken(null)
-        setUserTokenData(null)
-      }
-    });
-    */
-    
   },[])
 
   useEffect(() => {
@@ -320,9 +308,9 @@ export const AppProvider = ({children}: any) => {
     }
   }
 
-  const updateToken = (data: userModel, token?: string) => {
+  const updateToken = (data: userModel, token: string) => {
     if (database.current && userCurrentToken && userData){
-      update(ref(database.current, 'tokens/' + (userData.type === 'gm' && token ? token : userCurrentToken)), data);
+      update(ref(database.current, 'tokens/' + token), data);
     }
   }
 
@@ -430,7 +418,23 @@ export const AppProvider = ({children}: any) => {
 
       let new_terrain = active_scene.terrain.split(',');
 
-      console.log(new_terrain);
+      if (parseInt(terrain) == 2) {
+        terrain += '|Deslizar';
+      }
+
+      if (parseInt(terrain) == 3) {
+        const dano = prompt('Informe o dano de fogo');
+
+        if ( ! dano ) {
+          return;
+        }
+
+        terrain += '|Dano (' + dano + ')';
+      }
+
+      if (parseInt(terrain) == 4){
+        terrain += '|Movimento (-1)';
+      }
 
       new_terrain[index] = terrain;
 
@@ -490,6 +494,8 @@ export const AppProvider = ({children}: any) => {
     changeCurrentToken,
     isSheetOpen,
     setIsSheetOpen,
+    isCardsOpen,
+    setIsCardsOpen,
     setAttr,
     audioContext,
     audioFiles,

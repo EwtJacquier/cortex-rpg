@@ -20,7 +20,7 @@ const HomeContent = () => {
   const [currentMap, setCurrentMap] = useState('')
   const videoRef = useRef<any>()
   const videoRef2 = useRef<any>()
-  const {windowSize, gameData, userData, tokens, isSheetOpen, setIsSheetOpen, messages} = useApp()
+  const {windowSize, gameData, userData, tokens, isSheetOpen, setIsSheetOpen, isCardsOpen, setIsCardsOpen, messages} = useApp()
   const router = useRouter()
 
   useEffect(() => {
@@ -78,15 +78,19 @@ const HomeContent = () => {
                 <Typography color='#FFF' fontSize={'1.2rem'}>{gameData.maps[currentMap].subtitle}</Typography>  
               </Box>
               <Box sx={[styles.menu, isSceneOpen ? styles.menuItemBlack : {}]}>
+                {isSceneOpen && 
+                <Box onClick={() => {setIsCardsOpen(!isCardsOpen) }} sx={[styles.menuItem]}>
+                  <SaIcon name='user-card' theme='paper' size={30} style={styles.menuItemIcon} hover={isCardsOpen}  />
+                </Box>}
+                {isSceneOpen && userData && <Box onClick={() => {setIsSheetOpen(!isSheetOpen)}} sx={[styles.menuItem]}>
+                  <SaIcon name='document' theme='paper' size={30} style={styles.menuItemIcon} hover={isSheetOpen} />
+                </Box>}
                 {(gameData.map.scene_visible || userData.type === 'gm') && gameData.maps[currentMap].active_scene && 
                 <Box onClick={() => {if (!isSceneOpen) setIsSheetOpen(false); setIsSceneOpen(!isSceneOpen) }} sx={[styles.menuItem]}>
-                  <SaIcon name='map' theme='paper' size={30} style={styles.menuItemIcon} />
-                </Box>}
-                {userData && <Box onClick={() => {setIsSheetOpen(!isSheetOpen)}} sx={[styles.menuItem]}>
-                  <SaIcon name='document' theme='paper' size={30} style={styles.menuItemIcon} />
+                  <SaIcon name='map' theme='paper' size={30} style={styles.menuItemIcon} hover={isSceneOpen} />
                 </Box>}
                 {userData && userData.type === 'gm' && <Box onClick={() => {setIsOptionsOpen(!isOptionsOpen)}} sx={[styles.menuItem]}>
-                  <SaIcon name='zap' theme='paper' size={30} style={styles.menuItemIcon} />
+                  <SaIcon name='zap' theme='paper' size={30} style={styles.menuItemIcon} hover={isOptionsOpen} />
                 </Box>}
               </Box>
             </Box>
@@ -239,12 +243,12 @@ const styles = {
     position: 'absolute',
     top: 0,
     right: 0,
-    padding: '30px',
+    padding: '30px 20px',
     width: '240px',
     zIndex: 999999,
     display: 'flex',
     justifyContent: 'flex-end',
-    gap: '15px'
+    gap: '9px'
   },
   bannerContainer: {
     borderRadius: '16px', 

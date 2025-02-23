@@ -268,4 +268,27 @@ background: #3b3b41;
             0 100px 0px 10px rgba(0,255,0,0)
         ;
     }
-}   
+} 
+
+@media (max-width: 1120px) {
+    html::before{
+        content: 'This website doesn\'t work on mobile devices';
+        width: 100%;
+        display: flex;
+        left: 0;
+        top: 0;
+        height: 100%;
+        position: fixed;
+        color: #FFF;
+        background-color: #000;
+        z-index: 99999999999;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+@media (max-width: 1500px) {
+    .game {
+        zoom: 80%;
+    }
+}

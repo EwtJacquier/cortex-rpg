@@ -76,7 +76,7 @@ const theme = createTheme({
       "700": "#344054",
       "800": "#1D2939",
       "900": "#101828",
-      main: "#475467" // Same as 600
+      main: "#0069ff" // Same as 600
     },
     background: {
       paper: '#ffffff',
