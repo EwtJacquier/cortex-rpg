@@ -14,9 +14,6 @@ import zIndex from "@mui/material/styles/zIndex"
 type saModalProps = {
   children: React.ReactNode,
   isOpen?: boolean,
-  bg: string,
-  size: number,
-  title: string,
   doom?: string,
   getCanvasOpen: (open: boolean) => void,
   getIsOpen?: (value: boolean) => void
@@ -912,6 +909,7 @@ const SaModal = (props: saModalProps) => {
   return (
     <>
       <Modal
+        hideBackdrop={true}
         sx={{width: 'calc(100vw - 240px)', zIndex: 999999, '& > div:first-child': {width: 'calc(100vw - 240px)'} }}
         open={props.isOpen ?? false}
         onClose={handleClose}
@@ -929,7 +927,6 @@ const SaModal = (props: saModalProps) => {
             </Box>
             <Box className="typebox__timer" sx={[styles.typeboxTimer]}>{typeboxAvailableTime}</Box>
           </Box>}
-          <Image src={props.bg} alt='' width={windowSize?.width} height={windowSize?.height} style={{width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }} />
           {props.children}
           {false && <Box position='absolute' top='20px' left='0' display='flex' justifyContent='flex-start' paddingLeft='20px' alignItems='center' width={'100%'} flexDirection='column'>
             <Typography color="#FFF" textAlign='left' variant="h5" component='h2' style={{textShadow: '2px -2px 5px #000'}} alignSelf='flex-start' >{props.title}</Typography>
@@ -966,9 +963,9 @@ const SaModal = (props: saModalProps) => {
                   let bgStyle = {backgroundColor: 'rgba(0,0,0,0.2)', position: 'relative'};
                   const tileStyle = {
                     '&:not([datadamage="0"])::before': {content: 'attr(datadamage)', whiteSpace: 'nowrap', fontSize: '0.8rem', position: 'absolute', bottom: '0', left: '50%', transform: 'translateX(-50%)', padding: '0.2em', color: '#FFF', textAlign: 'center', backgroundColor: '#000'},
-                    '&::after': {content: 'attr(datatile)', fontSize: '1em', position: 'absolute', top: '0', left: '0', padding: '0.2em', color: '#FFF', width: '1em', textAlign: 'center', backgroundColor: '#000', opacity: '0.4'},
+                    '&::after': {content: 'attr(datatile)', fontSize: '1em', position: 'absolute', top: '0', left: '0', padding: '0.2em', color: '#FFF', width: '1em', textAlign: 'center', backgroundColor: '#000', opacity: '0.6'},
                   }
-                  const active_scene = gameData.maps[gameData.map.current].scenes[gameData.maps[gameData.map.current].active_scene];
+                  const active_scene = gameData.maps[gameData.map.current];
                   let terrain_damage = 0;
                   if (active_scene.terrain) {
                     let terrain = active_scene.terrain.split(',');
@@ -1007,7 +1004,7 @@ const SaModal = (props: saModalProps) => {
                 }) }
               </Box>
             </Box>
-            <Box height={'100%'} width='150px' style={{backgroundColor: 'rgba(0,0,0,0.8)', position: 'absolute', left: (isCardsOpen ? '0px' : '-150px'), transition: 'left 300ms', zIndex: 999999999}}>
+            <Box height={'100%'} width='150px' style={{backgroundColor: '#000', position: 'absolute', left: (isCardsOpen ? '0px' : '-150px'), transition: 'left 300ms', zIndex: 999999999}}>
               <Box height={'100%'} style={{overflowY: 'auto', overflowX: 'hidden'}} >
                 <Box gap={'20px'} minHeight={1} aria-valuenow={-1} flex={1} className="droptarget" display='flex' flexDirection='column' justifyContent='center' alignItems='center' position='relative' onDragOver={(event) => {event.preventDefault()}} onDragLeave={(event) => {event.target.classList.remove('hover')}} onDragEnter={(event) => {event.target.classList.add('hover')}} onDrop={(event) => {event.target.classList.remove('hover'); dropToken(event.dataTransfer.getData('text/plain'), event.target.ariaValueNow)}}>
                   {availableTokens.map((token, idx) => {

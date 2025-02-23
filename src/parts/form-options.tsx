@@ -19,7 +19,6 @@ const FormOptions = (props: FormProps) => {
   const [currentScene, setCurrentScene] = useState('')
   const [doom, setDoom] = useState<string>()
   const [doomEnabled, setDoomEnabled] = useState<boolean>()
-  const [sceneVisible, setSceneVisible] = useState<boolean>()
   const [night, setNight] = useState<boolean>()
   const [nightScene, setNightScene] = useState<boolean>()
 
@@ -30,8 +29,7 @@ const FormOptions = (props: FormProps) => {
       setCurrentMap(gameData.map.current)
       setDoom(gameData.map.doom)
       setDoomEnabled(gameData.map.doom_enabled)
-      setSceneVisible(gameData.map.scene_visible)
-      setNight(gameData.map.night)
+      setNight(gameData.maps[gameData.map.current].night ? gameData.maps[gameData.map.current].night : false)
       setNightScene(gameData.map.night_scene)
     }
     
@@ -43,13 +41,7 @@ const FormOptions = (props: FormProps) => {
 
     if (updateCurrentMap){
 
-      if (currentMap !== gameData.map.current || currentScene !== gameData.maps[gameData.map.current].active_scene){
-        updateCurrentMap(currentMap, currentScene);
-      }
-
-      if (sceneVisible !== gameData.map.scene_visible || night !== gameData.map.night || nightScene !== gameData.map.night_scene){
-        updateScene(sceneVisible, night, nightScene)
-      }
+      updateCurrentMap(currentMap, night);
 
       if (doomEnabled !== gameData.map.doom_enabled || doom !== gameData.map.doom ){
         updateDoom(doomEnabled, doom)
@@ -61,16 +53,10 @@ const FormOptions = (props: FormProps) => {
     setIsLoading(false)
   }
 
-  useEffect(() => {
-    if (currentMap){
-      setCurrentScene(gameData.maps[currentMap].active_scene)
-    }
-  }, [currentMap])
-
   return (
     <Box display='flex' flexDirection='column' style={styles.container}>
       <Typography component='h2' variant='h4'>Opções de Jogo</Typography>
-      {currentMap && currentScene && <Box marginTop={'10px'} display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
+      {currentMap && <Box marginTop={'10px'} display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
         <SaInput
           select={true}
           items={Object.keys(gameData.maps).map((item, index) => ({value: item, label: item}))}
@@ -78,35 +64,12 @@ const FormOptions = (props: FormProps) => {
           value={currentMap}
           getValue={setCurrentMap}
         />
-        <SaInput
-          select={true}
-          items={Object.keys(gameData.maps[currentMap].scenes).map((item, index) => ({value: item, label: item}))}
-          label='Cena Atual'
-          value={Object.keys(gameData.maps[currentMap].scenes).indexOf(currentScene) > -1 ? currentScene : Object.keys(gameData.maps[currentMap].scenes)[0]}
-          getValue={setCurrentScene}
-        />
-      </Box>}
-      {gameData.map && <Box marginTop={'10px'} display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
-        {sceneVisible !== undefined && <SaInput
-          select={true}
-          items={[{value: '0', label: 'Não'}, {value: '1', label: 'Sim'}]}
-          label='Cena Visível'
-          value={sceneVisible ? '1' : '0'}
-          getValue={(value: string) => setSceneVisible(value === '1')}
-        />}
         {night !== undefined && <SaInput
           select={true}
           items={[{value: '0', label: 'Não'}, {value: '1', label: 'Sim'}]}
           label='Noite'
           value={night ? '1' : '0'}
           getValue={(value: string) => setNight(value === '1')}
-        />}
-        {nightScene !== undefined && <SaInput
-          select={true}
-          items={[{value: '0', label: 'Não'}, {value: '1', label: 'Sim'}]}
-          label='Noite na Cena'
-          value={nightScene ? '1' : '0'}
-          getValue={(value: string) => setNightScene(value === '1')}
         />}
       </Box>}
       {gameData.map && <Box marginTop={'10px'} display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>

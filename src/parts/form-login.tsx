@@ -62,7 +62,7 @@ const FormLogin = () => {
       <Box display='flex' flexDirection='column' style={styles.container}>
         {errorMessage && <SaMessage type='error' message={errorMessage} onClose={() => {setErrorMessage('')}} />}
         <Typography variant="h3" component="h1" style={styles.text} textAlign='center'>
-          Cortex RPG
+          Battle Grid - RPG
         </Typography>
         <SaInput
           type="email"

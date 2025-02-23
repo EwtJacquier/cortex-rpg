@@ -69,13 +69,13 @@ const HomeContent = () => {
             <Box width='100vw' height='100vh' position='relative' overflow='visible'>
               {gameData.map && currentMap && <Image src={`/scenes/${currentMap}.webp`} alt='' width={windowSize?.width} height={windowSize?.height} style={{width: '100%', height: '100%', objectFit:'cover', pointerEvents: 'none' }}/>}
               {gameData.map && gameData.maps[currentMap].effect && renderVideo(`/effects/${gameData.maps[currentMap].effect}.webm`, videoRef)}
-              {gameData.map && gameData.map.night && <Box position='absolute' top={0} left={0} width={windowSize?.width} height={windowSize?.height} bgcolor='rgb(0 20 210 / 86%)' style={{mixBlendMode: 'darken'}}/>}
+              {gameData.map && gameData.maps[currentMap].night && <Box position='absolute' top={0} left={0} width={windowSize?.width} height={windowSize?.height} bgcolor='rgb(0 14 149 / 86%)' style={{mixBlendMode: 'multiply'}}/>}
               <Box sx={styles.title}>
                 {gameData.map.doom_enabled && <Box display='flex' gap='5px' justifyContent='center' marginBottom='5px'>
                   {gameData.map.doom.split(',').map((item: string, index: number)=><Typography key={index} color='#FFF' fontSize='1rem' fontWeight='bold' padding='0 5px' style={{backgroundColor: 'rgba(0,0,0,0.4)'}}>{item}</Typography>)}
                 </Box>}
-                <Typography variant="h1" color='#FFF' component="h1">{gameData.maps[currentMap].title}</Typography>
-                <Typography color='#FFF' fontSize={'1.2rem'}>{gameData.maps[currentMap].subtitle}</Typography>  
+                {!isSceneOpen && <Typography variant="h1" color='#FFF' component="h1">{gameData.maps[currentMap].title}</Typography>}
+                {!isSceneOpen && <Typography color='#FFF' fontSize={'1.2rem'}>{gameData.maps[currentMap].subtitle}</Typography>}
               </Box>
               <Box sx={[styles.menu, isSceneOpen ? styles.menuItemBlack : {}]}>
                 {isSceneOpen && 
@@ -85,7 +85,7 @@ const HomeContent = () => {
                 {isSceneOpen && userData && <Box onClick={() => {setIsSheetOpen(!isSheetOpen)}} sx={[styles.menuItem]}>
                   <SaIcon name='document' theme='paper' size={30} style={styles.menuItemIcon} hover={isSheetOpen} />
                 </Box>}
-                {(gameData.map.scene_visible || userData.type === 'gm') && gameData.maps[currentMap].active_scene && 
+                {( userData.type === 'gm') &&
                 <Box onClick={() => {if (!isSceneOpen) setIsSheetOpen(false); setIsSceneOpen(!isSceneOpen) }} sx={[styles.menuItem]}>
                   <SaIcon name='map' theme='paper' size={30} style={styles.menuItemIcon} hover={isSceneOpen} />
                 </Box>}
@@ -95,8 +95,8 @@ const HomeContent = () => {
               </Box>
             </Box>
           </Box>
-          {(gameData.map.scene_visible || userData.type === 'gm') && isSceneOpen && <Box width='240px' height='calc(100% - 105px)' marginTop={'105px'} position='relative' zIndex={999998}>
-            <Box style={{backgroundColor: 'rgba(0,0,0,0.4)', overflowY: 'auto'}} width='100%' height='100%' id='chat'>
+          {(userData.type === 'gm') && isSceneOpen && <Box width='240px' height='calc(100% - 105px)' marginTop={'105px'} position='relative' zIndex={999998}  bgcolor={'#000'}>
+            <Box style={{ overflowY: 'auto'}} width='100%' height='100%' id='chat'>
               <Box flex={1} display='flex' flexDirection='column-reverse' padding='20px' minHeight='100%' justifyContent={'flex-end'} gap={'20px'}>
               {messages.map((item, index) => {
                 const dices = item.firstResult ? item.firstResult.split(',') : []
@@ -113,7 +113,7 @@ const HomeContent = () => {
                   bonus = parseInt(item.bonus) * 3;
                 }
                 return (
-                  <Box key={index} bgcolor='#000' padding='20px' textAlign={'center'} sx={[styles.messages, index === messages.length - 1 ? {border: 'solid 2px #1d981d', opacity: '1'} : {}]}>
+                  <Box key={index} bgcolor='#000' padding='20px' textAlign={'center'} sx={[styles.messages, index === messages.length - 1 ? {border: 'solid 2px #FFF', opacity: '1'} : {}]}>
                     {item.date !== undefined && <Typography textAlign='center' marginTop={'-5px'} marginBottom={'5px'} color='rgba(255,255,255,0.6)' fontWeight={500} fontSize={'0.6rem'}>{item.date}</Typography>}
                     {item.token !== undefined && <Typography color='#ffc107' fontWeight={700} fontSize={'1rem'}>{tokens[item.token].name}</Typography>}
                     {item.token && item.target && <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
@@ -219,8 +219,7 @@ const HomeContent = () => {
             </Box>
           </Box>}
         </Box>
-        {(gameData.map.scene_visible || userData.type === 'gm') && gameData.maps[currentMap].active_scene && <SaModal getCanvasOpen={(open: boolean) => {setIsCanvasOpen(open)}} doom={gameData.map.doom_enabled && gameData.map.doom} isOpen={isSceneOpen} getIsOpen={setIsSceneOpen} bg={`/scenes/${currentMap}_${gameData.maps[currentMap].active_scene}.webp`} title={gameData.maps[currentMap].scenes[gameData.maps[currentMap].active_scene].name} size={gameData.maps[currentMap].scenes[gameData.maps[currentMap].active_scene].size}>
-          {gameData.map && gameData.maps[currentMap].scenes[gameData.maps[currentMap].active_scene].effect && renderVideo(`/effects/${gameData.maps[currentMap].scenes[gameData.maps[currentMap].active_scene].effect}.webm`, videoRef2)}
+        {(userData.type === 'gm') && <SaModal getCanvasOpen={(open: boolean) => {setIsCanvasOpen(open)}} doom={gameData.map.doom_enabled && gameData.map.doom} isOpen={isSceneOpen} getIsOpen={setIsSceneOpen}>
           {gameData.map && gameData.map.night_scene && <Box position='absolute' top={0} left={0} width={'100%'} height={'100%'} bgcolor='rgb(0 20 210 / 86%)' style={{mixBlendMode: 'darken'}}/>}
         </SaModal>}
         <SaModalBasic isOpen={isSheetOpen} getIsOpen={setIsSheetOpen}>
@@ -272,7 +271,7 @@ const styles = {
     }
   },
   menuItemBlack: {
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: '#000',
     '& > div': {
       backgroundColor: '#000'
     }

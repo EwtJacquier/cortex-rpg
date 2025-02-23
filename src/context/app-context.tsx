@@ -22,7 +22,7 @@ interface AppProps {
   addPP?: (slug: string) => void;
   subtractPP?: (slug: string) => void;
   setAttr?: (attr: 'pv'|'pm', slug: string, val: string|null) => void;
-  updateCurrentMap?: (map: string, scene: string) => void;
+  updateCurrentMap?: (map: string, night: boolean) => void;
   updateScene?: (sceneVisible: boolean, night: boolean, nigthScene: boolean) => void,
   updateDoom?: (doomEnabled: boolean, doom: string) => void,
   sendMessage?: (token: any, message: string, dices: any, firstResult: any, secondResult: any, target?: any, damage?: any, shield?: any, bonus?: any, buff?: boolean, item?: boolean, effect?: any, dices2?: any, message2?: string) => void;
@@ -385,7 +385,7 @@ export const AppProvider = ({children}: any) => {
     }    
   }
 
-  const updateCurrentMap = (map: string, scene: string) => {
+  const updateCurrentMap = (map: string, night: boolean) => {
     if (database.current && userData && tokensRef.current){
 
       runTransaction(ref(database.current, 'tokens'), (tokenList) => {
@@ -402,15 +402,16 @@ export const AppProvider = ({children}: any) => {
         current: map,
       });
 
+      console.log(night);
       update(ref(database.current, 'game/maps/' + map), {
-        active_scene: scene
+        night: night
       });
     }
   }
 
   const changeTerrain = (index: number, terrain: string) => {
     if (database.current && gameData){
-      let active_scene = gameData.maps[gameData.map.current].scenes[gameData.maps[gameData.map.current].active_scene];
+      let active_scene = gameData.maps[gameData.map.current];
 
       if ( ! active_scene.terrain ) {
         active_scene.terrain = '0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0';
@@ -442,7 +443,7 @@ export const AppProvider = ({children}: any) => {
 
       active_scene.terrain = new_terrain.join(',');
 
-      update(ref(database.current, 'game/maps/' + gameData.map.current + '/scenes/' + gameData.maps[gameData.map.current].active_scene), active_scene);
+      update(ref(database.current, 'game/maps/' + gameData.map.current), active_scene);
     }
   }
 
