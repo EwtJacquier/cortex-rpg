@@ -25,7 +25,7 @@ const SaMenu = (props: saMenuProps) => {
               </ListItemIcon>}
               <ListItemText><Typography color='#FFF' style={{fontWeight: '500'}} fontSize={18}>{item.text}{item.submenu && item.submenu.length > 0 ? ' >' : ''}</Typography></ListItemText>
               {item.submenu && item.submenu.length > 0 && <>
-                <Box className='submenu' sx={{position: 'absolute', display: 'none', backgroundColor: '#000', width: '200px', zIndex: 2, left: props.position === 'left' ? '115px' : '50%', top: '50%', transform: `translate(${props.position === 'center' ? '-50%' : '0'}, -50%)`, overflowY: 'scroll', maxHeight: '130px' }}>
+                <Box className='submenu' sx={{position: 'absolute', display: 'none', backgroundColor: '#000', width: '210px', zIndex: 2, left: props.position === 'left' ? '115px' : '50%', top: '50%', transform: `translate(${props.position === 'center' ? '-50%' : '0'}, -50%)`, overflowY: 'scroll', maxHeight: '130px' }}>
                   <MenuList>
                     {item.submenu.map((subitem, subindex) => {
                       subitem.text = subitem.text.replace('(ação)', '<span class="tag tag-red">A</span>');

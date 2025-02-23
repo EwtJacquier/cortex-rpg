@@ -535,7 +535,11 @@ const SaModal = (props: saModalProps) => {
     }
 
     const atknew = (slug: string, type: 'close' | 'ranged') => {
-      if ( ! userTokenData.attr.damage || ! userTokenData.attr.dices || ! tokens[slug].attr?.df || ! userTokenData.attr?.dif || ! tokens[slug].attr.df ){
+      let equippedWeapon = userTokenData?.attr?.equipped ? userTokenData?.attr?.equipped : 'main';
+      let weaponDamage = equippedWeapon === 'main' ? userTokenData.attr?.damage : userTokenData.attr?.damage2;
+      let weaponDices = equippedWeapon === 'main' ? userTokenData.attr?.dices : userTokenData.attr?.dices2;
+
+      if ( ! weaponDamage || ! weaponDices || ! tokens[slug].attr?.df || ! userTokenData.attr?.dif || ! tokens[slug].attr.df ){
         return;
       }
 
@@ -550,9 +554,9 @@ const SaModal = (props: saModalProps) => {
         d20: 0
       };
 
-      dados = sumDicesByString(dados, userTokenData.attr.dices);
+      dados = sumDicesByString(dados, weaponDices);
       
-      setMessageToSend({token: userCurrentToken, message: message, dices: dados, target: slug, shield: tokens[slug].attr.df, damage: userTokenData.attr.damage})
+      setMessageToSend({token: userCurrentToken, message: message, dices: dados, target: slug, shield: tokens[slug].attr.df, damage: weaponDamage})
       
       setDices(dados);
 
@@ -582,7 +586,11 @@ const SaModal = (props: saModalProps) => {
     }
 
     const useskill = (slug : string, skill: any) => {
-      if ( ! userTokenData.attr.damage || ! userTokenData.attr.dices || ! tokens[slug].attr?.df || ! userTokenData.attr?.dif || ! tokens[slug].attr.df ){
+      let equippedWeapon = userTokenData?.attr?.equipped ? userTokenData?.attr?.equipped : 'main';
+      let weaponDamage = equippedWeapon === 'main' ? userTokenData.attr?.damage : userTokenData.attr?.damage2;
+      let weaponDices = equippedWeapon === 'main' ? userTokenData.attr?.dices : userTokenData.attr?.dices2;
+      
+      if ( ! weaponDamage || ! weaponDices || ! tokens[slug].attr?.df || ! userTokenData.attr?.dif || ! tokens[slug].attr.df ){
         return;
       }
 
@@ -641,8 +649,8 @@ const SaModal = (props: saModalProps) => {
 
       if (skill.arma) {
         for (let i = 0; i < parseInt(skill.arma); i++) {
-          toSend.damage += parseInt(userTokenData.attr.damage);
-          dados = sumDicesByString(dados, userTokenData.attr.dices);
+          toSend.damage += parseInt(weaponDamage);
+          dados = sumDicesByString(dados, weaponDices);
         }
       }
 
@@ -799,6 +807,10 @@ const SaModal = (props: saModalProps) => {
       menuOptions.push({action: editSheet, text: 'Editar Ficha'})
     }
 
+    let equippedWeapon = token.attr?.equipped ? token?.attr?.equipped : 'main';
+
+    let al = equippedWeapon === 'main' ? token.attr?.al : token.attr?.al2;
+
     return (
       <Box onDoubleClick={() => { if (userData.type === 'gm' && token.slug !== userCurrentToken && changeCurrentToken) { changeCurrentToken(token.slug); setActiveTokenMenu(''); } }} className={'token__'+token.slug} width={width ? width : '35%'} sx={[{aspectRatio: '1/1', zIndex: activeTokenMenu === token.slug ? 10 : 1 , ...styles.cardContainer}, width !== '' ? styles.cardNormal : {}]} key={index+'t'} onContextMenu={(event) => {event.preventDefault(); setActiveTokenMenu(token.slug)}} onClick={(event) => {event.stopPropagation()}}>
         <Box width={'100%'} height='100%' sx={[styles.card, width !== '' ? styles.cardNormal : {}, token.slug === userCurrentToken ? styles.cardSelected : {}]} className={(userData.type === 'gm' || token.slug === userCurrentToken) ? 'draggable' : ''} >
@@ -829,8 +841,8 @@ const SaModal = (props: saModalProps) => {
             {(token.slug !== userCurrentToken && userData.type !== 'gm') && token.attr?.pm && token.attr?.pmmax && <Typography sx={[styles.attribute, {backgroundColor: '#0f4dbc'}]}><Image src={`/images/allied-star.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} /> ?</Typography>}
           </Box>}
           {width === '' && (token.type === 'player' || userData.type === 'gm') && token.attr && <Box position={'absolute'} display={'flex'} flexDirection={'column'} justifyContent={'space-between'} alignItems={'center'} gap={'5px'} right={'-2.9rem'} padding={'5px'} top={'50%'} style={{transform: 'translateY(-50%)'}}>
-            {token.attr?.mv && <Typography sx={styles.attribute}><Image src={`/images/footprint.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{token.attr.mv}</Typography>}
-            {token.attr?.al && <Typography sx={styles.attribute}><Image src={`/images/targeted.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{token.attr.al}</Typography>}
+            {token.attr?.mv && <Typography sx={styles.attribute}><Image src={`/images/footprint.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{token.attr?.mv}</Typography>}
+            {al && <Typography sx={styles.attribute}><Image src={`/images/targeted.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{al}</Typography>}
             {token.attr?.df && <Typography sx={styles.attribute}><Image src={`/images/checked-shield.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{token.attr.df}</Typography>}
             {false && token.attr.pp !== undefined && <Typography sx={[styles.attribute, {backgroundColor: '#0f4dbc'}]}><b>PP</b>{token.attr.pp}</Typography>}
           </Box>}
@@ -865,9 +877,6 @@ const SaModal = (props: saModalProps) => {
   useEffect(() => {
     if (tokens && userCurrentToken && userData){
       const scene_key = gameData.map.current + '_' + gameData.maps[gameData.map.current].active_scene
-
-      console.log(userTokens);
-
 
       setSceneTokens(Object.values(tokens).filter((token: any, idx) => token.position !== undefined && token.scene !== undefined && token.scene === scene_key))
       setAvailableTokens(Object.values(tokens).filter((token: any, idx) => {

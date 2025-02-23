@@ -113,7 +113,7 @@ const HomeContent = () => {
                   bonus = parseInt(item.bonus) * 3;
                 }
                 return (
-                  <Box key={index} bgcolor='#000' padding='20px' textAlign={'center'} sx={[styles.messages, index === messages.length - 1 ? {border: 'solid 2px #FFF', opacity: '1'} : {}]}>
+                  <Box key={index} bgcolor='#000' padding='20px' textAlign={'center'} sx={[styles.messages, index === messages.length - 1 ? {border: 'solid 1px #FFF', opacity: '1'} : {}]}>
                     {item.date !== undefined && <Typography textAlign='center' marginTop={'-5px'} marginBottom={'5px'} color='rgba(255,255,255,0.6)' fontWeight={500} fontSize={'0.6rem'}>{item.date}</Typography>}
                     {item.token !== undefined && <Typography color='#ffc107' fontWeight={700} fontSize={'1rem'}>{tokens[item.token].name}</Typography>}
                     {item.token && item.target && <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>

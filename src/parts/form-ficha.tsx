@@ -211,11 +211,11 @@ const FormFicha = (props: FormProps) => {
           value={userTokenData?.attr?.df}
         />
       </Box>
-      <Typography component='h2' variant='h6'>Arma Principal</Typography>
+      <Typography component='h2' variant='h6'>Armas</Typography>
       <Box display='flex' flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
         <SaInput
           type='text'
-          label='Nome da Arma'
+          label='Nome (Principal)'
           name='attr_weapon'
           value={userTokenData?.attr?.weapon}
         />
@@ -240,6 +240,42 @@ const FormFicha = (props: FormProps) => {
           value={userTokenData?.attr?.al}
         />
       </Box>
+      <Box display='flex' flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
+        <SaInput
+          type='text'
+          label='Nome (Secundária)'
+          name='attr_weapon2'
+          value={userTokenData?.attr?.weapon2}
+        />
+        <SaInput
+          type='number'
+          label='Dano Fixo'
+          name='attr_damage2'
+          value={userTokenData?.attr?.damage2}
+        />
+        <SaInput
+          select={true}
+          items={dice_data}
+          label='Dano Variável'
+          name='attr_dices2'
+          value={userTokenData?.attr?.dices2}
+        />
+        <SaInput
+          select={true}
+          items={mv_al_data}
+          label='Alcance'
+          name='attr_al2'
+          value={userTokenData?.attr?.al2}
+        />
+      </Box>
+      <Typography component='h2' variant='h6'>Arma Equipada</Typography>
+      <SaInput
+          select={true}
+          name='attr_equipped'
+          items={[{value: 'main', label: 'Principal'}, {value: 'sub', label: 'Secundária'}]}
+          label='Selecione'
+          value={userTokenData?.attr?.equipped ? userTokenData?.attr?.equipped : 'main'}
+        />
       <Typography component='h2' variant='h6' display='flex' justifyContent='space-between'>Habilidades <small style={{fontSize: '0.8rem', padding: '0.3rem 0.5rem', background: 'rgba(0,0,0,0.2)', fontWeight: 'normal'}}>nome|desc|pp|dados|fixo|arma|proprio|buff|postroll|postmessage|fx</small></Typography>
       {canShowLoop && macros.map((item, index) => {
         const comp = item.split(':::')
