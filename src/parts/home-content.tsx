@@ -94,7 +94,7 @@ const HomeContent = () => {
               </Box>
             </Box>
           </Box>
-          {(userData.type === 'gm') && isSceneOpen && <Box width='240px' height='calc(100% - 105px)' marginTop={'105px'} position='relative' zIndex={999998}  bgcolor={'#000'}>
+          {isSceneOpen && <Box width='240px' height='calc(100% - 105px)' marginTop={'105px'} position='relative' zIndex={999998}  bgcolor={'#000'}>
             <Box style={{ overflowY: 'auto'}} width='100%' height='100%' id='chat'>
               <Box flex={1} display='flex' flexDirection='column-reverse' padding='20px' minHeight='100%' justifyContent={'flex-end'} gap={'20px'}>
               {messages.map((item, index) => {
