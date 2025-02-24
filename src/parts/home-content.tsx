@@ -85,10 +85,9 @@ const HomeContent = () => {
                 {isSceneOpen && userData && <Box onClick={() => {setIsSheetOpen(!isSheetOpen)}} sx={[styles.menuItem]}>
                   <SaIcon name='document' theme='paper' size={30} style={styles.menuItemIcon} hover={isSheetOpen} />
                 </Box>}
-                {( userData.type === 'gm') &&
                 <Box onClick={() => {if (!isSceneOpen) setIsSheetOpen(false); setIsSceneOpen(!isSceneOpen) }} sx={[styles.menuItem]}>
                   <SaIcon name='map' theme='paper' size={30} style={styles.menuItemIcon} hover={isSceneOpen} />
-                </Box>}
+                </Box>
                 {userData && userData.type === 'gm' && <Box onClick={() => {setIsOptionsOpen(!isOptionsOpen)}} sx={[styles.menuItem]}>
                   <SaIcon name='zap' theme='paper' size={30} style={styles.menuItemIcon} hover={isOptionsOpen} />
                 </Box>}
