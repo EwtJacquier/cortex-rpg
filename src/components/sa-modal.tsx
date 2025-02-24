@@ -24,7 +24,7 @@ type diceTypes = {
 }
 
 const SaModal = (props: saModalProps) => {
-  const {audioContext, audioFiles, windowSize, userData, sendMessage, changeTerrain, duplicateMonsterToken, tokens, addPP, subtractPP, setAttr, deleteToken, gameData, userCurrentToken, updateToken, changeCurrentToken, setIsSheetOpen, userTokenData, messages, updateItemQuantity, isCardsOpen, setIsCardsOpen, userTokens} = useApp()
+  const {audioContext, audioFiles, windowSize, userData, sendMessage, changeTerrain, duplicateMonsterToken, tokens, addPP, subtractPP, setAttr, deleteToken, gameData, userCurrentToken, updateToken, changeCurrentToken, setIsSheetOpen, userTokenData, messages, updateItemQuantity, isCardsOpen, setIsCardsOpen, userTokens, alternateMount, alternateWeapon} = useApp()
   const [sceneTokens, setSceneTokens] = useState<any[]>([false])
   const [availableTokens, setAvailableTokens] = useState<any[]>([])
   const [activeTokenMenu, setActiveTokenMenu] = useState('')
@@ -227,18 +227,14 @@ const SaModal = (props: saModalProps) => {
         }
       }
       
-      if (messages[messages.length - 1].message && messages[messages.length - 1].message.indexOf('PP') > -1) {
-        phrase = shouts[Math.floor(Math.random() * 4)];
-        phrase2 = messages[messages.length - 1].message;
-        phrase2 = phrase2.replace('(ação)', '').replace('(suporte)', '').replace('(reação)', '').trim();
-        phrase2 = phrase2.indexOf('\\') > -1 ? phrase2.split('\\')[0].split('(')[0].trim() : phrase2;
-        phrase2 += '!';
-      }
-      else if (messages[messages.length - 1].message.indexOf('Atacou') > -1) {
+      if (messages[messages.length - 1].message.indexOf('Atacou') > -1) {
         phrase = shouts[Math.floor(Math.random() * 4)];
       }
       else {
-        phrase = '';
+        phrase = messages[messages.length - 1].message;
+        phrase = phrase.replace('(ação)', '').replace('(suporte)', '').replace('(reação)', '').trim();
+        phrase = phrase.indexOf('\\') > -1 ? phrase.split('\\')[0].split('(')[0].trim() : phrase;
+        phrase += '!';
       }
 
       if (actor && phrase) {
@@ -796,6 +792,19 @@ const SaModal = (props: saModalProps) => {
           menuOptions.push(items_submenu);
         }
       }
+  
+      if (token.slug === userCurrentToken || userData.type === 'gm') {
+        let other_submenu = {
+          text: 'Outros', 
+          submenu: []
+        }
+
+        other_submenu.submenu.push({action: () => { alternateWeapon(token.slug); setActiveTokenMenu('') } , text: 'Alternar Arma (ação)'});
+        other_submenu.submenu.push({action: () => { alternateMount(token.slug); setActiveTokenMenu('') }, text: 'Alternar Montaria (ação)'});
+        other_submenu.submenu.push({action: editSheet, text: 'Editar Ficha'}); 
+
+        menuOptions.push(other_submenu);
+      }
 
     }
     else if (userData.type === 'gm'){
@@ -803,10 +812,8 @@ const SaModal = (props: saModalProps) => {
         menuOptions.push({action: () => {if (changeCurrentToken) duplicateMonsterToken(token.slug); setActiveTokenMenu('') }, text: 'Duplicar'})
         menuOptions.push({action: () => {if (changeCurrentToken && confirm(`Confirma exclusão do token "${token.name}" ?`)) deleteToken(token.slug); setActiveTokenMenu('') }, text: 'Excluir'})
       }
-    }
 
-    if (userData.type === 'gm') {
-      menuOptions.push({action: editSheet, text: 'Editar Ficha'})
+      menuOptions.push({action: editSheet, text: 'Editar Ficha'});
     }
 
     let equippedWeapon = token.attr?.equipped ? token?.attr?.equipped : 'main';

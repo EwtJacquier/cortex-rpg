@@ -20,6 +20,8 @@ interface AppProps {
   duplicateMonsterToken?: (slug: string) => void;
   deleteToken?: (slug: string) => void;
   addPP?: (slug: string) => void;
+  alternateWeapon?: (slug: string) => void;
+  alternateMount?: (slug: string) => void;
   subtractPP?: (slug: string) => void;
   setAttr?: (attr: 'pv'|'pm'|'mpv', slug: string, val: string|null) => void;
   updateCurrentMap?: (map: string, night: boolean) => void;
@@ -306,6 +308,30 @@ export const AppProvider = ({children}: any) => {
     }
   }
 
+  const alternateWeapon = (slug: string) => {
+    if (database.current && tokens && tokens[slug]){
+      const equipped = tokens[slug].attr?.equipped ? tokens[slug].attr?.equipped : 'main';
+
+      let newObj = tokens[slug].attr
+      
+      newObj['equipped'] = equipped === 'main' ? 'sub' : 'main'
+
+      update(ref(database.current, 'tokens/'+slug+'/attr'), newObj);
+    }
+  }
+
+  const alternateMount = (slug: string) => {
+    if (database.current && tokens && tokens[slug]){
+      const mequipped = tokens[slug].attr?.mequipped ? tokens[slug].attr?.mequipped : '0';
+
+      let newObj = tokens[slug].attr
+      
+      newObj['mequipped'] = mequipped === '0' ? '1' : '0'
+
+      update(ref(database.current, 'tokens/'+slug+'/attr'), newObj);
+    }
+  }
+
   const updateToken = (data: userModel, token: string) => {
     if (database.current && userCurrentToken && userData){
       update(ref(database.current, 'tokens/' + token), data);
@@ -485,6 +511,8 @@ export const AppProvider = ({children}: any) => {
     duplicateMonsterToken,
     deleteToken,
     addPP,
+    alternateWeapon,
+    alternateMount,
     subtractPP,
     updateCurrentMap,
     updateScene,

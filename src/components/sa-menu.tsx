@@ -18,6 +18,7 @@ const SaMenu = (props: saMenuProps) => {
     <Box sx={{position: 'absolute', backgroundColor: '#000', width: '120px', zIndex: 2, left: props.position === 'left' ? '100%' : '50%', top: '50%', transform: `translate(${props.position === 'center' ? '-50%' : '0'}, -50%)`, display: props.visible ? 'block' : 'none' }}>
       <MenuList>
         {props.items.map((item, index) => {
+          const lastStyle = index === props.items.length - 1 ? { top: 'auto', transform: 'none', bottom: 0} : {};
           return (
             <MenuItem className='menu-item' key={index} onClick={item.action} sx={{'&:hover': {backgroundColor: 'rgba(255,255,255,0.2)', '.submenu': {display: 'block !important'} }}}>
               {item.icon !== undefined && <ListItemIcon>
@@ -25,7 +26,7 @@ const SaMenu = (props: saMenuProps) => {
               </ListItemIcon>}
               <ListItemText><Typography color='#FFF' style={{fontWeight: '500'}} fontSize={18}>{item.text}{item.submenu && item.submenu.length > 0 ? ' >' : ''}</Typography></ListItemText>
               {item.submenu && item.submenu.length > 0 && <>
-                <Box className='submenu' sx={{position: 'absolute', display: 'none', backgroundColor: '#000', width: '210px', zIndex: 2, left: props.position === 'left' ? '115px' : '50%', top: '50%', transform: `translate(${props.position === 'center' ? '-50%' : '0'}, -50%)`, overflowY: 'scroll', maxHeight: '130px' }}>
+                <Box className='submenu' sx={{position: 'absolute', display: 'none', backgroundColor: '#000', width: '210px', zIndex: 2, left: props.position === 'left' ? '115px' : '50%', top: '50%', transform: `translate(${props.position === 'center' ? '-50%' : '0'}, -50%)`, overflowY: 'scroll', maxHeight: '130px', ...lastStyle }}>
                   <MenuList>
                     {item.submenu.map((subitem, subindex) => {
                       subitem.text = subitem.text.replace('(ação)', '<span class="tag tag-red">A</span>');
