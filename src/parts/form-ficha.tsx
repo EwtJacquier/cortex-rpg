@@ -122,7 +122,10 @@ const FormFicha = (props: FormProps) => {
     {value: '2', label: '2 casas'},
     {value: '3', label: '3 casas'},
     {value: '4', label: '4 casas'},
-    {value: '5', label: '5 casas'}
+    {value: '5', label: '5 casas'},
+    {value: '6', label: '6 casas'},
+    {value: '7', label: '7 casas'},
+    {value: '8', label: '8 casas'},
   ]
 
   const number_data = [
@@ -276,6 +279,43 @@ const FormFicha = (props: FormProps) => {
           label='Selecione'
           value={userTokenData?.attr?.equipped ? userTokenData?.attr?.equipped : 'main'}
         />
+      <Typography component='h2' variant='h6'>Montaria</Typography>
+      <Box display='flex' flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
+        <SaInput
+          type='text'
+          label='Nome'
+          name='attr_mname'
+          value={userTokenData?.attr?.mname}
+        />
+        <SaInput
+          select={true}
+          name='attr_mequipped'
+          items={[{value: '0', label: 'Não'}, {value: '1', label: 'Sim'}]}
+          label='Equipada?'
+          value={userTokenData?.attr?.mequipped ? userTokenData?.attr?.mequipped : '0'}
+        />
+      </Box>
+      <Box display='flex' flexDirection='row' justifyContent='flex' alignItems='flex-start' gap='20px'>
+        <SaInput
+          type='number'
+          label='PV Atual'
+          name='attr_mpv'
+          value={userTokenData?.attr?.mpv}
+        />
+        <SaInput
+          type='number'
+          label='PV Máximo'
+          name='attr_mpvmax'
+          value={userTokenData?.attr?.mpvmax}
+        />
+        <SaInput
+          select={true}
+          items={mv_al_data}
+          label='Movimentação'
+          name='attr_mmv'
+          value={userTokenData?.attr?.mmv}
+        />
+      </Box>
       <Typography component='h2' variant='h6' display='flex' justifyContent='space-between'>Habilidades <small style={{fontSize: '0.8rem', padding: '0.3rem 0.5rem', background: 'rgba(0,0,0,0.2)', fontWeight: 'normal'}}>nome|desc|pp|dados|fixo|arma|proprio|buff|postroll|postmessage|fx</small></Typography>
       {canShowLoop && macros.map((item, index) => {
         const comp = item.split(':::')

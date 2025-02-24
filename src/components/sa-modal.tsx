@@ -836,13 +836,16 @@ const SaModal = (props: saModalProps) => {
           <Box className='tokenName' position={'absolute'} display='flex' flexDirection='column' justifyContent='center' alignItems='center' bgcolor='rgba(0,0,0,0.4)' padding='0.2rem 0.2rem 0.4rem 0.2rem' left={0} bottom={0} width='100%' sx={{opacity: 0, pointerEvents: 'none'}}>
             <Typography textAlign={'center'} fontSize='0.8rem' color='#FFF' fontWeight={'600'} lineHeight={'1.2'}>{token.name}</Typography>
           </Box>
-          {width === '' && <Box position={'absolute'} display={'flex'} flexDirection={'column'} justifyContent={'space-between'} alignItems={'center'} gap={'5px'} left={'-2.9rem'} padding={'5px'} top={'50%'} style={{transform: 'translateY(-50%)'}}>
-            {(token.slug === userCurrentToken || userData.type === 'gm') && token.attr?.pv && token.attr?.pvmax && <Typography onClick={() => {setAttr('pv',token.slug,prompt(`Modificar PV (Máx: ${token.attr.pvmax})`))}} sx={[styles.attribute, {backgroundColor: '#0e7f0e', cursor: 'pointer'}]}><Image src={`/images/hearts.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{token.attr.pv}</Typography>}
-            {(token.slug === userCurrentToken || userData.type === 'gm') && token.attr?.pm && token.attr?.pmmax && <Typography onClick={() => {setAttr('pm',token.slug,prompt(`Modificar PP (Máx: ${token.attr.pmmax})`))}} sx={[styles.attribute, {backgroundColor: '#0f4dbc', cursor: 'pointer'}]}><Image src={`/images/allied-star.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{token.attr.pm}</Typography>}
+          {width === '' && <Box position={'absolute'} display={'flex'} flexDirection={'column'} justifyContent={'space-between'} alignItems={'center'} gap={'5px'} left={'-3.8rem'} width={'3.4rem'} padding={'5px'} top={'50%'} style={{transform: 'translateY(-50%)'}}>
+            {(token.slug === userCurrentToken || userData.type === 'gm') && token.attr?.pv && token.attr?.pvmax && <Typography onClick={() => {setAttr('pv',token.slug,prompt(`Modificar PV (Máx: ${token.attr.pvmax})`))}} sx={[styles.attribute, {backgroundColor: '#0e7f0e', cursor: 'pointer'}]}><Image src={`/images/hearts.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} /><span>{token.attr.pv}</span></Typography>}
+            {(token.slug === userCurrentToken || userData.type === 'gm') && token.attr?.mequipped === '1' && token.attr?.mpv && token.attr?.mpvmax && <Typography onClick={() => {setAttr('mpv',token.slug,prompt(`Modificar PV (Máx: ${token.attr.mpvmax})`))}} sx={[styles.attribute, {backgroundColor: '#d96e16', cursor: 'pointer'}]}><Image src={`/images/horse-head.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} /><span>{token.attr.mpv}</span></Typography>}
+            {(token.slug === userCurrentToken || userData.type === 'gm') && token.attr?.pm && token.attr?.pmmax && <Typography onClick={() => {setAttr('pm',token.slug,prompt(`Modificar PP (Máx: ${token.attr.pmmax})`))}} sx={[styles.attribute, {backgroundColor: '#0f4dbc', cursor: 'pointer'}]}><Image src={`/images/allied-star.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} /><span>{token.attr.pm}</span></Typography>}
             {(token.slug !== userCurrentToken && userData.type !== 'gm') && token.attr?.pv && token.attr?.pvmax && <Typography sx={[styles.attribute, {backgroundColor: '#0e7f0e'}]}><Image src={`/images/hearts.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{ Math.round((token.attr.pv / token.attr.pvmax) * 100) } %</Typography>}
+            {(token.slug !== userCurrentToken && userData.type !== 'gm') && token.attr?.mequipped === '1' && token.attr?.mpv && token.attr?.mpvmax && <Typography sx={[styles.attribute, {backgroundColor: '#d96e16'}]}><Image src={`/images/hearts.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{ Math.round((token.attr.mpv / token.attr.mpvmax) * 100) } %</Typography>}
             {(token.slug !== userCurrentToken && userData.type !== 'gm') && token.attr?.pm && token.attr?.pmmax && <Typography sx={[styles.attribute, {backgroundColor: '#0f4dbc'}]}><Image src={`/images/allied-star.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} /> ?</Typography>}
           </Box>}
-          {width === '' && (token.type === 'player' || userData.type === 'gm') && token.attr && <Box position={'absolute'} display={'flex'} flexDirection={'column'} justifyContent={'space-between'} alignItems={'center'} gap={'5px'} right={'-2.9rem'} padding={'5px'} top={'50%'} style={{transform: 'translateY(-50%)'}}>
+          {width === '' && (token.type === 'player' || userData.type === 'gm') && token.attr && <Box position={'absolute'} display={'flex'} flexDirection={'column'} justifyContent={'space-between'} alignItems={'center'} gap={'5px'} width={'2.5rem'} right={'-2.9rem'} padding={'5px'} top={'50%'} style={{transform: 'translateY(-50%)'}}>
+            {token.attr?.mequipped === '1' && token.attr?.mmv && <Typography sx={styles.attribute}><Image src={`/images/horseshoe.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{token.attr?.mmv}</Typography>}
             {token.attr?.mv && <Typography sx={styles.attribute}><Image src={`/images/footprint.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{token.attr?.mv}</Typography>}
             {al && <Typography sx={styles.attribute}><Image src={`/images/targeted.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{al}</Typography>}
             {token.attr?.df && <Typography sx={styles.attribute}><Image src={`/images/checked-shield.png`} alt='' width={20} height={20} style={{width: '20px', height: '20px', objectFit: 'cover', pointerEvents: 'none' }} />{token.attr.df}</Typography>}
@@ -1215,13 +1218,17 @@ const styles = {
   attribute: {
     color: '#FFF',
     backgroundColor: '#000',
-    minWidth: '2.4rem',
+    minWidth: '100%',
     textAlign: 'center',
     fontSize: '0.8rem',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     gap: '0 0.2rem',
+    '& span': {
+      width: '1rem',
+      textAlign: 'right'
+    },
     '& b':{
       fontWeight: '700',
       fontSize: '0.8rem',

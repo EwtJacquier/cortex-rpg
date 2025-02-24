@@ -21,7 +21,7 @@ interface AppProps {
   deleteToken?: (slug: string) => void;
   addPP?: (slug: string) => void;
   subtractPP?: (slug: string) => void;
-  setAttr?: (attr: 'pv'|'pm', slug: string, val: string|null) => void;
+  setAttr?: (attr: 'pv'|'pm'|'mpv', slug: string, val: string|null) => void;
   updateCurrentMap?: (map: string, night: boolean) => void;
   updateScene?: (sceneVisible: boolean, night: boolean, nigthScene: boolean) => void,
   updateDoom?: (doomEnabled: boolean, doom: string) => void,
@@ -270,11 +270,9 @@ export const AppProvider = ({children}: any) => {
     }
   }
 
-  const setAttr = (attr: 'pv'|'pm', slug : string, val: string|null) => {
+  const setAttr = (attr: 'pv'|'pm'|'mpv', slug : string, val: string|null) => {
     if (database.current && tokens && tokens[slug] && val && !isNaN(val)){
       let newObj = tokens[slug].attr
-
-      console.log(val);
 
       if (val.trim().indexOf('+') === 0 || val.trim().indexOf('-') === 0) {
         newObj[attr] = (parseInt(newObj[attr]) + parseInt(val)).toString();
