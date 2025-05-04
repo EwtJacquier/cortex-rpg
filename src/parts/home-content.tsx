@@ -20,7 +20,7 @@ const HomeContent = () => {
   const [currentMap, setCurrentMap] = useState('')
   const videoRef = useRef<any>()
   const videoRef2 = useRef<any>()
-  const {windowSize, gameData, userData, tokens, isSheetOpen, setIsSheetOpen, isCardsOpen, setIsCardsOpen, messages} = useApp()
+  const {windowSize, gameData, userData, tokens, isSheetOpen, setIsSheetOpen, isCardsOpen, setIsCardsOpen, messages, userCurrentToken} = useApp()
   const router = useRouter()
 
   useEffect(() => {
@@ -82,7 +82,7 @@ const HomeContent = () => {
                 <Box onClick={() => {setIsCardsOpen(!isCardsOpen) }} sx={[styles.menuItem]}>
                   <SaIcon name='user-card' theme='paper' size={30} style={styles.menuItemIcon} hover={isCardsOpen}  />
                 </Box>}
-                {isSceneOpen && userData && <Box onClick={() => {setIsSheetOpen(!isSheetOpen)}} sx={[styles.menuItem]}>
+                {isSceneOpen && userData && userCurrentToken && <Box onClick={() => {setIsSheetOpen(!isSheetOpen)}} sx={[styles.menuItem]}>
                   <SaIcon name='document' theme='paper' size={30} style={styles.menuItemIcon} hover={isSheetOpen} />
                 </Box>}
                 <Box onClick={() => {if (!isSceneOpen) setIsSheetOpen(false); setIsSceneOpen(!isSceneOpen) }} sx={[styles.menuItem]}>
@@ -118,7 +118,7 @@ const HomeContent = () => {
                     {item.token && item.target && <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                     <SaImageWithFallback
                       fallback={`/tokens/default.png`} 
-                      src={`/tokens/${item.token.replace(/_copy/g, "")}.png`} 
+                      src={item.token && tokens[item.token].image ? tokens[item.token].image : `/tokens/default.png`} 
                       alt='' 
                       width={40} 
                       height={40}
@@ -126,7 +126,7 @@ const HomeContent = () => {
                     <Typography color='#FFF' fontWeight={700} fontSize={'2rem'}>⇨</Typography>
                     <SaImageWithFallback
                       fallback={`/tokens/default.png`} 
-                      src={`/tokens/${item.target.replace(/_copy/g, "")}.png`} 
+                      src={item.target && tokens[item.target].image ? tokens[item.target].image : `/tokens/default.png`} 
                       alt='' 
                       width={40} 
                       height={40}

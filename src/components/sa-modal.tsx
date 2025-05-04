@@ -398,9 +398,6 @@ const SaModal = (props: saModalProps) => {
         return;
       }
     }
-    if (isCardsOpen && userData.type !== 'gm') {
-      setIsCardsOpen(false);
-    }
     if (updateToken && !isNaN(parseInt(index))) updateToken({position: parseInt(index), scene: gameData.map.current + '_' + gameData.maps[gameData.map.current].active_scene}, slug)
   }
 
@@ -472,11 +469,11 @@ const SaModal = (props: saModalProps) => {
   }
 
   const updateCurrentTokenSkillsAndItems = () => {
-    if (userTokenData.macros) {
+    if (userTokenData && userTokenData.macros) {
       setCurrentTokenSkills(formatSkills(userTokenData.macros))
     }
 
-    if (userTokenData.items) {
+    if (userTokenData && userTokenData.items) {
       setCurrentTokenItems(formatSkills(userTokenData.items, true));
     }
   }
@@ -720,7 +717,7 @@ const SaModal = (props: saModalProps) => {
 
     if (width === ''){
 
-      if (token.slug !== userCurrentToken){
+      if (userCurrentToken && token.slug !== userCurrentToken){
         if (userTokenData.position != token.position){
           menuOptions.push({action: () => {atknew( token.slug, 'ranged' )}, text: 'Atacar'})
         }
@@ -758,7 +755,7 @@ const SaModal = (props: saModalProps) => {
         }
       }
 
-      if (token.slug === userCurrentToken) {
+      if (userCurrentToken && token.slug === userCurrentToken) {
 
         if (currentTokenSkills.own.length > 0){
           let support_submenu = {
@@ -793,7 +790,7 @@ const SaModal = (props: saModalProps) => {
         }
       }
   
-      if (token.slug === userCurrentToken || userData.type === 'gm') {
+      if (userCurrentToken && (token.slug === userCurrentToken || userData.type === 'gm')) {
         let other_submenu = {
           text: 'Outros', 
           submenu: []
@@ -823,18 +820,18 @@ const SaModal = (props: saModalProps) => {
     let attr_style = {'& span': { width: '1.4rem', textAlign: 'center'}};
 
     return (
-      <Box onDoubleClick={() => { if (userData.type === 'gm' && token.slug !== userCurrentToken && changeCurrentToken) { changeCurrentToken(token.slug); setActiveTokenMenu(''); } }} className={'token__'+token.slug} width={width ? width : '35%'} sx={[{aspectRatio: '1/1', zIndex: activeTokenMenu === token.slug ? 10 : 1 , ...styles.cardContainer}, width !== '' ? styles.cardNormal : {}]} key={index+'t'} onContextMenu={(event) => {event.preventDefault(); setActiveTokenMenu(token.slug)}} onClick={(event) => {event.stopPropagation()}}>
-        <Box width={'100%'} height='100%' sx={[styles.card, width !== '' ? styles.cardNormal : {}, token.slug === userCurrentToken ? styles.cardSelected : {}]} className={(userData.type === 'gm' || token.slug === userCurrentToken) ? 'draggable' : ''} >
+      <Box onDoubleClick={() => { if ( token.slug !== userCurrentToken && changeCurrentToken) { changeCurrentToken(token.slug); setActiveTokenMenu(''); } }} className={'token__'+token.slug} width={width ? width : '35%'} sx={[{aspectRatio: '1/1', zIndex: activeTokenMenu === token.slug ? 10 : 1 , ...styles.cardContainer}, width !== '' ? styles.cardNormal : {}]} key={index+'t'} onContextMenu={(event) => {event.preventDefault(); setActiveTokenMenu(token.slug)}} onClick={(event) => {event.stopPropagation()}}>
+        <Box width={'100%'} height='100%' sx={[styles.card, width !== '' ? styles.cardNormal : {}, token.slug === userCurrentToken ? styles.cardSelected : {}]} className={(userData.type === 'gm' || ( token.uid && token.uid === userData.uid ) ) ? 'draggable' : ''} >
           <Box className="tokenSFX" sx={[styles.tokenSFX]}></Box>
           <SaImageWithFallback
             fallback={`/tokens/default.png`} 
-            src={`/tokens/${token.slug.replace(/_copy/g, "")}.png`} 
+            src={token.image ? token.image : `/tokens/default.png`} 
             alt='' 
             width={500} 
             height={500} 
             style={{width: '100%', height: '100%', cursor: 'pointer'}}
             onDragStart={(event) => {
-              if ((userData.type === 'gm' || token.slug === userCurrentToken) || (userData.type === 'player' && userTokens && userTokens.indexOf(token.slug) > -1)){
+              if ( userData.type === 'gm' || ( token.uid && token.uid === userData.uid ) ){
                 event.dataTransfer.setData('text/plain', token.slug)
               }
               else{
@@ -889,14 +886,14 @@ const SaModal = (props: saModalProps) => {
   }, [])
 
   useEffect(() => {
-    if (tokens && userCurrentToken && userData){
+    if (tokens && userData){
       const scene_key = gameData.map.current + '_' + gameData.maps[gameData.map.current].active_scene
 
       setSceneTokens(Object.values(tokens).filter((token: any, idx) => token.position !== undefined && token.scene !== undefined && token.scene === scene_key))
       setAvailableTokens(Object.values(tokens).filter((token: any, idx) => {
         return (userData.type === 'gm' && ((token.position === undefined || token.position < 0)))
         || 
-        (token.type === 'player' && userTokens && userTokens.indexOf(token.slug) > -1 && (token.position === undefined || token.position < 0))
+        (userData.type === 'player' && token.uid && token.uid === userData.uid && (token.position === undefined || token.position < 0))
       }))
     }
   }, [tokens, gameData])
@@ -927,6 +924,14 @@ const SaModal = (props: saModalProps) => {
     case 'player': active_turn_text += 'Jogadores'; break;
     case 'enemy': active_turn_text += 'Inimigos'; break;
     default: active_turn_text += 'NPCs'; break;
+  }
+
+  const newSheet = () => {
+    if (changeCurrentToken) changeCurrentToken('');
+      
+    setActiveTokenMenu('')
+
+    if (setIsSheetOpen) setIsSheetOpen(true)
   }
 
   return (
@@ -1030,6 +1035,7 @@ const SaModal = (props: saModalProps) => {
             <Box height={'100%'} width='150px' style={{backgroundColor: '#000', position: 'absolute', left: (isCardsOpen ? '0px' : '-150px'), transition: 'left 300ms', zIndex: 999999999}}>
               <Box height={'100%'} style={{overflowY: 'auto', overflowX: 'hidden'}} >
                 <Box gap={'20px'} minHeight={1} aria-valuenow={-1} flex={1} className="droptarget" display='flex' flexDirection='column' justifyContent='center' alignItems='center' position='relative' onDragOver={(event) => {event.preventDefault()}} onDragLeave={(event) => {event.target.classList.remove('hover')}} onDragEnter={(event) => {event.target.classList.add('hover')}} onDrop={(event) => {event.target.classList.remove('hover'); dropToken(event.dataTransfer.getData('text/plain'), event.target.ariaValueNow)}}>
+                  <Box onClick={newSheet} sx={{marginTop: '30px', cursor: 'pointer', fontSize: '60px', aspectRatio: '1/1', width: '60%', textAlign: 'center', lineHeight: '1.1', border: 'dashed 3px #FFF', color: '#FFF'}}>+</Box>
                   {availableTokens.map((token, idx) => {
                     return renderToken(token, 'av_'+idx, '60%')
                   })}

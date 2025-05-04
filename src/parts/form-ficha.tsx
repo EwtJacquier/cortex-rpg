@@ -7,12 +7,13 @@ import SaInput from '@/components/sa-input';
 import SaButton from '@/components/sa-button';
 import SaMessage from '@/components/sa-message';
 import { useApp, userModel } from '@/context/app-context';
+import SaImageWithFallback from "@/components/sa-image-with-fallback";
 
 type FormProps = {
   afterSave: () => void
 }
 const FormFicha = (props: FormProps) => {
-  const {userTokenData, updateToken, userCurrentToken} = useApp()
+  const {userTokenData, updateToken, userCurrentToken, users, userData, uploadBase64Image} = useApp()
 
   const [macros, setMacros] = useState<string[]>(['','','','','','','','','',''])
   const [itens, setItens] = useState<string[]>(['nome=Poção de Vida (ação)|desc=Recupera 15 pontos de vida.|fixo=10|buff:::5','nome=Fragmento de Cristal (ação)|desc=Recupera 5 pontos de poder.|fixo=5|buff:::1','','','','','','','',''])
@@ -21,42 +22,54 @@ const FormFicha = (props: FormProps) => {
   
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  
+  const [tokenUrl, setTokenUrl] = useState('');
+  const [tokenLoading, setTokenLoading] = useState(false);
+  const tokenInputRef = useRef();
 
   useEffect(() => {
-    if (userTokenData){
-      if (userTokenData.macros){
-        let newMacros = userTokenData.macros;
+    if (userTokenData?.macros){
+      let newMacros = userTokenData.macros;
 
-        if (newMacros.length === 5) {
-          newMacros = [
-            ...newMacros,
-            ...['','','','','']
-          ]
-        }
-
-        setMacros(newMacros)
+      if (newMacros.length === 5) {
+        newMacros = [
+          ...newMacros,
+          ...['','','','','']
+        ]
       }
 
-      if (userTokenData.items){
-        let newItems = userTokenData.items;
+      setMacros(newMacros)
+    }
 
-        if (newItems.length === 5) {
-          newItems = [
-            ...newItems,
-            ...['','','','','']
-          ]
-        }
-        
-        setItens(newItems)
-      }
+    if (userTokenData?.items){
+      let newItems = userTokenData.items;
 
-      if (userTokenData.others){
-        setOthers(userTokenData.others)
+      if (newItems.length === 5) {
+        newItems = [
+          ...newItems,
+          ...['','','','','']
+        ]
       }
+      
+      setItens(newItems)
+    }
+
+    if (userTokenData?.others){
+      setOthers(userTokenData.others)
+    }
+
+    if (userTokenData?.image) {
+      setTokenUrl(userTokenData.image)
     }
 
     setCanShowLoop(true)
   }, [userTokenData])
+
+  useEffect(() => {
+    setTimeout(() => {
+      setTokenLoading(false);
+    }, 1000);
+  }, [tokenUrl]);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -98,7 +111,7 @@ const FormFicha = (props: FormProps) => {
       });
 
       if (updateToken){
-        updateToken(newTokenInfo,userCurrentToken)
+        updateToken( newTokenInfo,userCurrentToken ? userCurrentToken : Date.now() );
       }
 
       props.afterSave()
@@ -155,20 +168,93 @@ const FormFicha = (props: FormProps) => {
     {value: '50', label: '50'},
   ]
 
+  const handleImageClick = () => {
+    tokenInputRef.current.click(); // ativa o input oculto
+  };
+
+  const handleTokenChange = async (e) => {
+    const file = e.target.files[0];
+
+    if (! file || ! uploadBase64Image) return;
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64 = reader.result.split(",")[1]; // remove "data:image/png;base64," etc
+      const matches = reader.result.match(/^data:(image\/[a-zA-Z]*);base64,/);
+      
+      if ( ! matches || ! matches[1] ) {
+        return;
+      }
+
+      // Calcula o tamanho da string base64 em bytes
+      const byteLength = (base64.length * 3) / 4;
+
+      // 300KB = 300 * 1024 bytes = 307200 bytes
+      if (byteLength > 307200) {
+        alert( 'Tamanho da imagem não pode ultrapassar 300kb' );
+        return false;
+      }
+
+      setTokenLoading(true);
+      
+      const url = await uploadBase64Image( base64, matches[1] );
+
+      if ( !url ) {
+        alert( 'Failed to upload the image. ');
+      }
+
+      setTokenUrl(url);
+    };
+
+    reader.readAsDataURL(file);
+  };
+
   return (
     <Box paddingTop={'20px'}>
     {errorMessage && <SaMessage type='error' message={errorMessage} onClose={() => {setErrorMessage('')}} />}
-    {userTokenData && <Typography component='h2' variant='h4'>Ficha de Personagem - {userTokenData.name}</Typography>}
+    <Typography component='h2' variant='h4'>Ficha de Personagem - {userTokenData ? userTokenData.name : 'Nova Ficha'}</Typography>
     <form style={styles.container} onSubmit={onSubmit}>
       <Box marginTop={'10px'} display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
+        <Box width={'160px'} height={'160px'} flexShrink={'0'}>
+          <input type="file" accept="image/*" onChange={handleTokenChange} ref={tokenInputRef} style={{ display: "none" }} />
+          <input type="hidden" name="image" value={tokenUrl} />
+          <SaImageWithFallback
+              fallback={`/tokens/default.png`} 
+              src={tokenUrl} 
+              alt='' 
+              width={160} 
+              height={160} 
+              style={{width: '100%', height: '100%', cursor: 'pointer', border: 'dashed 2px #000'}}
+              onClick={handleImageClick}
+          />
+          {tokenLoading && <Typography fontSize={'12px'} textAlign={'center'}>Enviando imagem...</Typography>}
+        </Box>
+        <Box width={'100%'} marginTop={'10px'} display='flex' flexDirection='column' justifyContent='space-between' alignItems='flex-start' gap='20px'>
+          <SaInput
+            type='text'
+            label='Nome'
+            name='name'
+            value={userTokenData?.name}
+          />
+          <SaInput
+            select={true}
+            items={difficulty}
+            label='Nível do Herói'
+            name='attr_dif'
+            value={userTokenData?.attr?.dif}
+          />
+        </Box>
+      </Box>
+      { userData && userData.type === 'gm' && <Box marginTop={'10px'} display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
         <SaInput
           select={true}
-          items={difficulty}
-          label='Nível do Herói'
-          name='attr_dif'
-          value={userTokenData?.attr?.dif}
+          items={Object.entries(users).map(([ key, data ]) => ({value: key, label: data.name}))}
+          label='Usuário'
+          name='uid'
+          value={userTokenData?.uid ? userTokenData.uid : '' }
         />
-      </Box>
+      </Box> }
+      { userData && userData.type === 'player' && <input type="hidden" name="uid" value={userData.uid}/> }
       <Box marginTop={'10px'} display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
         <SaInput
           type='number'

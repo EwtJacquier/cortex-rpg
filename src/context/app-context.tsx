@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, child, get, onValue, DatabaseReference, set, Database, update, onChildAdded, runTransaction, remove  } from "firebase/database";
+import { ref as storageRef, uploadString, getDownloadURL, getStorage, FirebaseStorage } from "firebase/storage";
 import { Auth, User, UserCredential, getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import * as BdMask from "../helpers/mask"
 
@@ -37,6 +38,7 @@ interface AppProps {
   audioFiles?: string[],
   updateItemQuantity?: (index: number, quantity: number) => void,
   changeTerrain?: (index: number, terrain: string) => void,
+  uploadBase64Image?: ( base64String: string, contentType: string ) => Promise<string>,
 }
 
 const AppContext = createContext<AppProps>({});
@@ -79,6 +81,7 @@ export const useApp = () => {
 
 export const AppProvider = ({children}: any) => {
   const database = useRef<Database>() 
+  const storage = useRef<FirebaseStorage>()
   const auth = useRef<Auth>()
   const gameRef = useRef<DatabaseReference>() 
   const usersRef = useRef<DatabaseReference>() 
@@ -117,12 +120,14 @@ export const AppProvider = ({children}: any) => {
 
   useEffect(() => {
     const firebaseConfig = {
+      storageBucket: "warpg-f9069.appspot.com",
       databaseURL: "https://warpg-f9069-default-rtdb.firebaseio.com",
       apiKey: 'AIzaSyCCkoyNv1E5b38IFEviNLNv2mpQUX2kM20'
     };
     
     const app = initializeApp(firebaseConfig);
     database.current = getDatabase(app);
+    storage.current = getStorage(app);
     gameRef.current = ref(database.current, 'game')
     usersRef.current = ref(database.current, 'users')
     tokensRef.current = ref(database.current, 'tokens')
@@ -132,18 +137,23 @@ export const AppProvider = ({children}: any) => {
 
   useEffect(() => {
     if (users && tokens && user){
-      const tks = users[user.uid].tokens.split(',')
+      let activeToken: any = null;
 
-      let activeToken = userCurrentToken
+      Object.entries(tokens).forEach( ( [key, tok] ) => {
+        if ( ! activeToken && tok.uid && tok.uid === user.uid ) {
+          activeToken = tok
+        }
+      } )
 
-      if (!activeToken){
-        setUserCurrentToken(tks[0])
-        activeToken = tks[0]
+      if ( activeToken ) {
+        setUserCurrentToken(activeToken.slug)
+        setUserTokenData(activeToken)
       }
       
-      setUserData(users[user.uid])
-      setUserTokens(tks)
-      setUserTokenData(tokens[activeToken])
+      setUserData({
+        ...users[user.uid],
+        uid: user.uid
+      })
     }
   }, [users, tokens, user])
 
@@ -333,7 +343,10 @@ export const AppProvider = ({children}: any) => {
   }
 
   const updateToken = (data: userModel, token: string) => {
-    if (database.current && userCurrentToken && userData){
+    if (database.current && userData){
+      if ( ! data.slug ) {
+        data.slug = token;
+      }
       update(ref(database.current, 'tokens/' + token), data);
     }
   }
@@ -491,8 +504,40 @@ export const AppProvider = ({children}: any) => {
   }
 
   const changeCurrentToken = (token: string) => {
-    setUserCurrentToken(token)
-    setUserTokenData(tokens[token])
+    if ( userData ) {
+      if ( userData.type === 'gm' ) {
+        setUserCurrentToken(token ? token : null);
+        setUserTokenData(token ? tokens[token] : null);
+      } else if ( token && tokens[token] && tokens[token].uid && tokens[token].uid === userData.uid ) {
+        setUserCurrentToken(token);
+        setUserTokenData(tokens[token]);
+      }
+    }
+  }
+
+  async function uploadBase64Image( base64String: string, contentType: string ) {
+    if ( ! storage.current ) {
+      return '';
+    }
+
+    const map: any = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/webp': 'webp',
+      'image/gif': 'gif',
+    };
+
+    const extension = map[contentType] || 'jpg';
+
+    const filePath = `tokens/${Date.now()}.${extension}`;
+    const imageRef = storageRef(storage.current, filePath);
+  
+    await uploadString(imageRef, base64String, 'base64', {
+      contentType: contentType,
+    });
+  
+    const url = await getDownloadURL(imageRef);
+    return url;
   }
 
   const value = {
@@ -527,7 +572,8 @@ export const AppProvider = ({children}: any) => {
     audioContext,
     audioFiles,
     updateItemQuantity,
-    changeTerrain
+    changeTerrain,
+    uploadBase64Image
   };
 
   return (
