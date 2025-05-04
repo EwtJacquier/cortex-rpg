@@ -1,6 +1,6 @@
 'use client'
 
-import SaModal, { saToken } from '@/components/sa-modal';
+import SaBattleGrid from '@/components/sa-battle-grid';
 import { useApp } from '@/context/app-context';
 import { Box, Typography } from "@mui/material"
 import Image from 'next/image';
@@ -218,9 +218,9 @@ const HomeContent = () => {
             </Box>
           </Box>}
         </Box>
-        <SaModal getCanvasOpen={(open: boolean) => {setIsCanvasOpen(open)}} doom={gameData.map.doom_enabled && gameData.map.doom} isOpen={isSceneOpen} getIsOpen={setIsSceneOpen}>
+        <SaBattleGrid getCanvasOpen={(open: boolean) => {setIsCanvasOpen(open)}} doom={gameData.map.doom_enabled && gameData.map.doom} isOpen={isSceneOpen} getIsOpen={setIsSceneOpen}>
           {gameData.map && gameData.map.night_scene && <Box position='absolute' top={0} left={0} width={'100%'} height={'100%'} bgcolor='rgb(0 20 210 / 86%)' style={{mixBlendMode: 'darken'}}/>}
-        </SaModal>
+        </SaBattleGrid>
         <SaModalBasic isOpen={isSheetOpen} getIsOpen={setIsSheetOpen}>
           <FormFicha afterSave={() => setIsSheetOpen(false)}/>
         </SaModalBasic>

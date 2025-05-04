@@ -11,7 +11,7 @@ import SaImageWithFallback from "./sa-image-with-fallback"
 import SaMenu from "./sa-menu"
 import zIndex from "@mui/material/styles/zIndex"
 
-type saModalProps = {
+type saBattleGridProps = {
   children: React.ReactNode,
   isOpen?: boolean,
   doom?: string,
@@ -23,7 +23,7 @@ type diceTypes = {
   d4: number, d6: number, d8: number, d10: number, d12: number
 }
 
-const SaModal = (props: saModalProps) => {
+const SaBattleGrid = (props: saBattleGridProps) => {
   const {audioContext, audioFiles, windowSize, userData, sendMessage, changeTerrain, duplicateMonsterToken, tokens, addPP, subtractPP, setAttr, deleteToken, gameData, userCurrentToken, updateToken, changeCurrentToken, setIsSheetOpen, userTokenData, messages, updateItemQuantity, isCardsOpen, setIsCardsOpen, userTokens, alternateMount, alternateWeapon} = useApp()
   const [sceneTokens, setSceneTokens] = useState<any[]>([false])
   const [availableTokens, setAvailableTokens] = useState<any[]>([])
@@ -1330,4 +1330,4 @@ const styles = {
   diceInput: {width: '2rem', outline: 'none', border: 'none', color: '#FFF', backgroundColor: 'rgba(0,0,0,0.6)', textAlign: 'center', paddingBottom: '5px', paddingTop: '7px', fontSize: '0.8rem'}
 }
 
-export default SaModal
+export default SaBattleGrid
