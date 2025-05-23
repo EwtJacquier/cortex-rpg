@@ -35,10 +35,11 @@ const HomeContent = () => {
     }
 
     if (gameData && userData){
-      setCurrentMap(gameData.map.current)
-
-      if (videoRef.current) videoRef.current.load()
-      if (videoRef2.current) videoRef2.current.load()
+      if (currentMap !== gameData.map.current) {
+        setCurrentMap(gameData.map.current)
+        if (videoRef.current) videoRef.current.load()
+        if (videoRef2.current) videoRef2.current.load()
+      }
     }
   },[userData, gameData])
 
