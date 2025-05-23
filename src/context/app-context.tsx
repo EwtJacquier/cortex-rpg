@@ -117,7 +117,6 @@ export const AppProvider = ({children}: any) => {
     }
   },[newMessage])
 
-
   useEffect(() => {
     const firebaseConfig = {
       storageBucket: "warpg-f9069.appspot.com",
@@ -136,11 +135,49 @@ export const AppProvider = ({children}: any) => {
   },[])
 
   useEffect(() => {
+    if ( ! user ) {
+      return;
+    }
+
+    onChildAdded(chatRef.current, (data) => {
+      data = data.val()
+
+      if (data){
+        setNewMessage(data)
+      }
+    });
+
+    const updateGameData = (data: any) => {
+      setGameData(data)
+    }
+
+    const updateUsers = (data: any) => {
+      setUsers(data)
+    }
+
+    const updateTokens = (data: any) => {
+      setTokens(data);
+    }
+
+    consume(gameRef.current, updateGameData)
+    observe(gameRef.current, updateGameData)
+
+    consume(usersRef.current, updateUsers)
+    observe(usersRef.current, updateUsers)
+
+    consume(tokensRef.current, updateTokens)
+    observe(tokensRef.current, updateTokens)
+
+  }, [user])
+
+  useEffect(() => {
     if (users && tokens && user){
       let activeToken: any = null;
 
       Object.entries(tokens).forEach( ( [key, tok] ) => {
-        if ( ! activeToken && tok.uid && tok.uid === user.uid ) {
+        if ( userCurrentToken && key === userCurrentToken ) {
+          activeToken = tok;
+        } else if ( ! activeToken && tok.uid && tok.uid === user.uid ) {
           activeToken = tok
         }
       } )
@@ -205,35 +242,6 @@ export const AppProvider = ({children}: any) => {
           const userCredential: UserCredential = await signInWithEmailAndPassword(auth.current, email, password)
 
           if (userCredential.user){
-            onChildAdded(chatRef.current, (data) => {
-              data = data.val()
-    
-              if (data){
-                setNewMessage(data)
-              }
-            });
-        
-            const updateGameData = (data: any) => {
-              setGameData(data)
-            }
-        
-            const updateUsers = (data: any) => {
-              setUsers(data)
-            }
-        
-            const updateTokens = (data: any) => {
-              setTokens(data);
-            }
-        
-            consume(gameRef.current, updateGameData)
-            observe(gameRef.current, updateGameData)
-        
-            consume(usersRef.current, updateUsers)
-            observe(usersRef.current, updateUsers)
-        
-            consume(tokensRef.current, updateTokens)
-            observe(tokensRef.current, updateTokens)
-    
             setUser(userCredential.user)
 
             resolve(true)
@@ -353,8 +361,6 @@ export const AppProvider = ({children}: any) => {
       }
 
       update(ref(database.current, 'tokens/' + token), data);
-
-      setUserTokenData(data);
     }
   }
 
@@ -446,7 +452,6 @@ export const AppProvider = ({children}: any) => {
         current: map,
       });
 
-      console.log(night);
       update(ref(database.current, 'game/maps/' + map), {
         night: night
       });
@@ -482,8 +487,6 @@ export const AppProvider = ({children}: any) => {
       }
 
       new_terrain[index] = terrain;
-
-      console.log(index, terrain, new_terrain[index]);
 
       active_scene.terrain = new_terrain.join(',');
 
