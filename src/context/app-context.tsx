@@ -351,7 +351,10 @@ export const AppProvider = ({children}: any) => {
       if ( ! data.type ) {
         data.type = 'npc';
       }
+
       update(ref(database.current, 'tokens/' + token), data);
+
+      setUserTokenData(data);
     }
   }
 
