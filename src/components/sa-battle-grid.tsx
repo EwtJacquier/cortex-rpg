@@ -839,7 +839,7 @@ const SaBattleGrid = (props: saBattleGridProps) => {
               }
             }}
           />
-          <Box className='tokenName' position={'absolute'} display='flex' flexDirection='column' justifyContent='center' alignItems='center' bgcolor='rgba(0,0,0,0.4)' padding='0.2rem 0.2rem 0.4rem 0.2rem' left={0} bottom={0} width='100%' sx={{opacity: 0, pointerEvents: 'none'}}>
+          <Box className='tokenName' position={'absolute'} display='flex' flexDirection='column' justifyContent='center' alignItems='center' bgcolor='rgba(0,0,0,0.4)' padding='0.2rem' left={0} bottom={0} width='100%' sx={{opacity: 1, pointerEvents: 'none', marginTop: '10px'}}>
             <Typography textAlign={'center'} fontSize='0.8rem' color='#FFF' fontWeight={'600'} lineHeight={'1.2'}>{token.name}</Typography>
           </Box>
           {width === '' && <Box position={'absolute'} display={'flex'} flexDirection={'column'} justifyContent={'space-between'} alignItems={'center'} gap={'5px'} left={'-3.8rem'} width={'3.4rem'} padding={'5px'} top={'50%'} style={{transform: 'translateY(-50%)'}}>

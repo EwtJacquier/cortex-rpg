@@ -347,6 +347,10 @@ export const AppProvider = ({children}: any) => {
       if ( ! data.slug ) {
         data.slug = token;
       }
+
+      if ( ! data.type ) {
+        data.type = 'npc';
+      }
       update(ref(database.current, 'tokens/' + token), data);
     }
   }

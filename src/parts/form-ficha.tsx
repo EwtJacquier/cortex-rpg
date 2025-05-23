@@ -168,6 +168,12 @@ const FormFicha = (props: FormProps) => {
     {value: '50', label: '50'},
   ]
 
+  const tokenTypes = [
+    {value: 'npc', label: 'NPC'},
+    {value: 'monster', label: 'Monstro'},
+    {value: 'player', label: 'Jogador'},
+  ]
+
   const handleImageClick = () => {
     tokenInputRef.current.click(); // ativa o input oculto
   };
@@ -255,6 +261,16 @@ const FormFicha = (props: FormProps) => {
         />
       </Box> }
       { userData && userData.type === 'player' && <input type="hidden" name="uid" value={userData.uid}/> }
+      { userData && userData.type === 'gm' && <Box marginTop={'10px'} display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
+        <SaInput
+          select={true}
+          items={Object.entries(tokenTypes).map(([ key, data ]) => ({value: data.value, label: data.label}))}
+          label='Tipo'
+          name='type'
+          value={userTokenData?.type ? userTokenData.type : 'npc' }
+        />
+      </Box> }
+      { userData && userData.type === 'player' && <input type="hidden" name="type" value={'player'}/> }
       <Box marginTop={'10px'} display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
         <SaInput
           type='number'

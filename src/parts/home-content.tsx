@@ -94,7 +94,7 @@ const HomeContent = () => {
               </Box>
             </Box>
           </Box>
-          {isSceneOpen && <Box width='240px' height='calc(100% - 105px)' marginTop={'105px'} position='relative' zIndex={999998}  bgcolor={'#000'}>
+          {isSceneOpen && <Box width='240px' height='calc(100% - 105px)' marginTop={'105px'} position='relative' zIndex={999998}  bgcolor={'rgba(0,0,0,0.2)'}>
             <Box style={{ overflowY: 'auto'}} width='100%' height='100%' id='chat'>
               <Box flex={1} display='flex' flexDirection='column-reverse' padding='20px' minHeight='100%' justifyContent={'flex-end'} gap={'20px'}>
               {messages.map((item, index) => {
@@ -112,7 +112,7 @@ const HomeContent = () => {
                   bonus = parseInt(item.bonus) * 3;
                 }
                 return (
-                  <Box key={index} bgcolor='#000' padding='20px' textAlign={'center'} sx={[styles.messages, index === messages.length - 1 ? {border: 'solid 1px #FFF', opacity: '1'} : {}]}>
+                  <Box key={index} bgcolor='rgba(0,0,0,0.6)' padding='20px' textAlign={'center'} sx={[styles.messages, index === messages.length - 1 ? {border: 'solid 1px green', opacity: '1'} : {}]}>
                     {item.date !== undefined && <Typography textAlign='center' marginTop={'-5px'} marginBottom={'5px'} color='rgba(255,255,255,0.6)' fontWeight={500} fontSize={'0.6rem'}>{item.date}</Typography>}
                     {item.token !== undefined && <Typography color='#ffc107' fontWeight={700} fontSize={'1rem'}>{tokens[item.token].name}</Typography>}
                     {item.token && item.target && <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
@@ -148,7 +148,7 @@ const HomeContent = () => {
                         return (
                           <>
                             {index > 0 && <Box key={'plus_'+index} color={'#FFF'} alignSelf='center'><Typography fontSize={'1.2rem'}>+</Typography></Box>}
-                            <Box key={'dice_'+index} color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
+                            <Box key={'dice_'+index} color={'#FFF'} bgcolor={'#000'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
                               <Typography textAlign={'center'} color={item[1] == max ? '#23ba23' : (item[1] == 1 ? 'red' : 'white')}>{item[1]}</Typography>
                               <Typography fontSize={'0.8rem'}>{item[0]}</Typography>
                             </Box>
@@ -157,21 +157,21 @@ const HomeContent = () => {
                       })}
                       {item.damage && item.damage > 0 && <>
                         {dices.length > 0 && <Box color={'#FFF'} alignSelf='center'><Typography fontSize={'1.2rem'}>+</Typography></Box>}
-                        <Box color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
+                        <Box color={'#FFF'} bgcolor={'#000'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
                           <Typography textAlign={'center'} color={'white'}>{item.damage}</Typography>
                           <Typography fontSize={'0.8rem'}>fixo</Typography>
                         </Box>
                       </>}
                       {bonus > 0 && <>
                         <Box color={'#FFF'} alignSelf='center'><Typography fontSize={'1.2rem'}>+</Typography></Box>
-                        <Box color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
+                        <Box color={'#FFF'} bgcolor={'#000'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
                           <Typography textAlign={'center'} color={'white'}>{ bonus }</Typography>
                           <Typography fontSize={'0.8rem'}>bonus</Typography>
                         </Box>
                       </>}
                       {(dices.length > 0 || item.damage) && <>
                         <Box color={'#FFF'} alignSelf='center'><Typography fontSize={'1.2rem'}>=</Typography></Box>
-                        <Box alignItems={'center'} justifyContent={'center'} color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
+                        <Box alignItems={'center'} bgcolor={'#000'} justifyContent={'center'} color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
                           <Typography textAlign={'center'} color={'#23ba23'}>{sum + parseInt(item.damage ? item.damage : 0) + (bonus > 0 ? bonus : 0)}</Typography>
                           <Typography fontSize={'0.8rem'}>total</Typography>
                         </Box>
@@ -189,7 +189,7 @@ const HomeContent = () => {
                         return (
                           <>
                             {index > 0 && <Box key={'plus_'+index} color={'#FFF'} alignSelf='center'><Typography fontSize={'1.2rem'}>+</Typography></Box>}
-                            <Box key={'dice_'+index} color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
+                            <Box key={'dice_'+index} bgcolor={'#000'} color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
                               <Typography textAlign={'center'} color={item[1] == max ? '#23ba23' : (item[1] == 1 ? 'red' : 'white')}>{item[1]}</Typography>
                               <Typography fontSize={'0.8rem'}>{item[0]}</Typography>
                             </Box>
@@ -198,14 +198,14 @@ const HomeContent = () => {
                       })}
                       {item.damage2 && item.damage2 > 0 && <>
                         {dices.length > 0 && <Box color={'#FFF'} alignSelf='center'><Typography fontSize={'1.2rem'}>+</Typography></Box>}
-                        <Box color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
+                        <Box color={'#FFF'} bgcolor={'#000'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
                           <Typography textAlign={'center'} color={'white'}>{item.damage}</Typography>
                           <Typography fontSize={'0.8rem'}>fixo</Typography>
                         </Box>
                       </>}
                       {(dices2.length > 0 || item.damage2) && <>
                         <Box color={'#FFF'} alignSelf='center'><Typography fontSize={'1.2rem'}>=</Typography></Box>
-                        <Box alignItems={'center'} justifyContent={'center'} color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
+                        <Box alignItems={'center'} bgcolor={'#000'} justifyContent={'center'} color={'#FFF'} border={'solid 1px rgba(255,255,255,0.2)'} width={'40px'} textAlign={'center'}>
                           <Typography textAlign={'center'} color={'#23ba23'}>{sum2 + parseInt(item.damage2 ? item.damage2 : 0)}</Typography>
                           <Typography fontSize={'0.8rem'}>total</Typography>
                         </Box>
@@ -270,9 +270,9 @@ const styles = {
     }
   },
   menuItemBlack: {
-    backgroundColor: '#000',
+    backgroundColor: 'rgba(0,0,0,0.2)',
     '& > div': {
-      backgroundColor: '#000'
+      backgroundColor: 'rgba(0,0,0,0.6)'
     }
   },
   menuItemIcon: {
