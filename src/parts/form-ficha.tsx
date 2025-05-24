@@ -418,6 +418,15 @@ const FormFicha = (props: FormProps) => {
           value={userTokenData?.attr?.mmv}
         />
       </Box>
+      <Typography component='h2' variant='h6' display='flex' justifyContent='space-between'>Frases de Efeito <small style={{fontSize: '0.8rem', padding: '0.3rem 0.5rem', background: 'rgba(0,0,0,0.2)', fontWeight: 'normal'}}>separe as frases com ponto e vírgula ;</small></Typography>
+      <Box display='flex' flexDirection='row' justifyContent='space-between' alignItems='flex-start' gap='20px'>
+        <SaInput
+          type='text'
+          label='Frases'
+          name='shouts'
+          value={userTokenData?.shouts}
+        />
+      </Box>
       <Typography component='h2' variant='h6' display='flex' justifyContent='space-between'>Habilidades <small style={{fontSize: '0.8rem', padding: '0.3rem 0.5rem', background: 'rgba(0,0,0,0.2)', fontWeight: 'normal'}}>nome|desc|pp|dados|fixo|arma|proprio|buff|postroll|postmessage|fx</small></Typography>
       {canShowLoop && macros.map((item, index) => {
         const comp = item.split(':::')
