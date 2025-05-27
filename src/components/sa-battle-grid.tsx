@@ -217,15 +217,6 @@ const SaBattleGrid = (props: saBattleGridProps) => {
       let phrase = '';
 
       let shouts = typeof( tokens[ messages[messages.length - 1].token ].shouts ) !== 'undefined' ? tokens[ messages[messages.length - 1].token ].shouts.split(';') : ['Toma essa!', 'Minha vez!', 'Você não vai escapar!', 'Isso acaba aqui!'];
-
-      if ( messages[messages.length - 1].buff ) {
-        if ( messages[messages.length - 1].token === messages[messages.length - 1].target ) {
-          shouts = ['Não irei falhar!','Tudo sob controle!','Ainda não acabou!','Minha vez!'];
-        }
-        else {
-          shouts = ['Deixa comigo!','Não desista!','Vamos nessa!','Você consegue!'];
-        }
-      }
       
       if (messages[messages.length - 1].message.indexOf('Atacou') > -1) {
         phrase = shouts[Math.floor(Math.random() * shouts.length)];
