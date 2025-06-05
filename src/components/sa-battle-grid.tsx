@@ -1001,6 +1001,7 @@ const SaBattleGrid = (props: saBattleGridProps) => {
                         case 2: bgStyle = styles.iceTerrain; break;
                         case 3: bgStyle = styles.fireTerrain; break;
                         case 4: bgStyle = styles.breachTerrain; break;
+                        case 5: bgStyle = styles.targetTerrain; break;
                       }
 
                       bgStyle.backgroundColor += ' !important';
@@ -1009,11 +1010,12 @@ const SaBattleGrid = (props: saBattleGridProps) => {
                   return (
                     <Box aria-valuenow={index} border='dashed 2px rgba(0,0,0,0.2)' sx={[bgStyle, tileStyle, {'&:not(.hover):hover .terrain': {display: 'flex !important'}}]} display='flex' gap='60px' justifyContent='center' alignItems='center' key={index} position='relative' className="droptarget" onDragOver={(event) => {event.preventDefault()}} onDragLeave={(event) => {event.target.classList.remove('hover')}} onDragEnter={(event) => {event.target.classList.add('hover')}} onDrop={(event) => {event.target.classList.remove('hover'); dropToken(event.dataTransfer.getData('text/plain'), event.target.ariaValueNow)}} dataTile={tileLetter + tileNumber} dataDamage={terrain_damage}>
                       {userData.type === 'gm' && <Box className='terrain' position={'absolute'} left='0' bottom='0' display={'none'} width={'100%'} height='100%' justifyContent={'center'} flexDirection={'column'} gap={'2px'} alignItems={'flex-end'} >
-                        <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '0'); }}>0</button>
-                        <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '1'); }}>1</button>
-                        <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '2'); }}>2</button>
-                        <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '3'); }}>3</button>
-                        <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '4'); }}>4</button>
+                        <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '0'); }}>Clear</button>
+                        <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '5'); }}>Target</button>
+                        <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '1'); }}>Blocked</button>
+                        <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '2'); }}>Ice</button>
+                        <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '3'); }}>Fire</button>
+                        <button style={styles.terrainButton} onClick={() => { changeTerrain(index, '4'); }}>Wood</button>
                       </Box>}
                       {sceneTokens.filter((token, idx) => token.position === index).map((token, idx) => {
                         return renderToken(token, index+'_'+idx)
@@ -1317,6 +1319,9 @@ const styles = {
     backgroundImage: 'url(/images/breach.png)',
     backgroundRepeat: 'no-repeat',
     backgroundSize: '100% 100% !important'
+  },
+  targetTerrain: {
+    border: 'dashed 4px red'
   },
   diceInput: {width: '2rem', outline: 'none', border: 'none', color: '#FFF', backgroundColor: 'rgba(0,0,0,0.6)', textAlign: 'center', paddingBottom: '5px', paddingTop: '7px', fontSize: '0.8rem'}
 }
