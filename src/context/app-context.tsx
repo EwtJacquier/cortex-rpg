@@ -374,8 +374,8 @@ export const AppProvider = ({children}: any) => {
           message: message,
           author: user.uid,
           token: token,
-          firstResult: firstResult,
-          secondResult: secondResult,
+          firstResult: firstResult ? firstResult : '',
+          secondResult: secondResult ? secondResult : '',
           date: BdMask.maskDate(new Date(), true),
           name: username
         }

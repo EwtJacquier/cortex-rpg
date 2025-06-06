@@ -358,13 +358,15 @@ const SaBattleGrid = (props: saBattleGridProps) => {
         if (messageToSend){
           const firstResult = previousResult ? previousResult : send;
           const secondResult = previousResult ? send : '';
+
+          console.log(messageToSend);
           
           sendMessage(messageToSend.token, messageToSend.message, messageToSend.dices, firstResult, secondResult, messageToSend.target, messageToSend.damage, messageToSend.shield, messageToSend.bonus, messageToSend.buff, messageToSend.item, messageToSend.effect, messageToSend.dices2, messageToSend.message2)
   
           setMessageToSend(undefined)
         }
         else{
-          sendMessage(userCurrentToken, 'Rolou dados', null, send)
+          sendMessage(userCurrentToken, 'Rolou dados', dices, send, '', userCurrentToken, null, null, null, true)
         }
 
         setDices({d4: 0, d6: 0, d8: 0, d10: 0, d12: 0, d20: 0});
@@ -1046,7 +1048,7 @@ const SaBattleGrid = (props: saBattleGridProps) => {
                 <button style={styles.diceButton} onClick={() => { if (dices[item] < 10) setDices({...dices, [item]: dices[item] + 1}) }}>+</button>
               </Box>)}
               <button onClick={() => {setDices({d4: 0, d6: 0, d8: 0, d10: 0, d12: 0})}} style={{...styles.diceButton, padding: '8px 0.5rem', fontSize: '0.8rem' }}>Limpar</button>
-              <button onClick={() => {document.getElementById('roll')?.click()}} style={{...styles.diceButton, padding: '8px 0.5rem', fontSize: '0.8rem' }}>Rolar</button>
+              <button onClick={() => {playAudio(6, 0.5); document.getElementById('roll')?.click();}} style={{...styles.diceButton, padding: '8px 0.5rem', fontSize: '0.8rem' }}>Rolar</button>
             </Box>
           </Box>}
         </Box>
@@ -1321,7 +1323,7 @@ const styles = {
     backgroundSize: '100% 100% !important'
   },
   targetTerrain: {
-    border: 'dashed 4px red'
+    border: 'dashed 4px red',
   },
   diceInput: {width: '2rem', outline: 'none', border: 'none', color: '#FFF', backgroundColor: 'rgba(0,0,0,0.6)', textAlign: 'center', paddingBottom: '5px', paddingTop: '7px', fontSize: '0.8rem'}
 }
