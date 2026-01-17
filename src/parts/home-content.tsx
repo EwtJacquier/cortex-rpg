@@ -3,9 +3,7 @@
 import SaBattleGrid from '@/components/sa-battle-grid';
 import { useApp } from '@/context/app-context';
 import { Box, Typography } from "@mui/material"
-import Image from 'next/image';
 import { MutableRefObject, useEffect, useRef, useState } from 'react';
-import theme from '@/app/theme';
 import SaIcon from '@/components/sa-icon';
 import { useRouter } from 'next/navigation';
 import SaModalBasic from '@/components/sa-modal-basic';
@@ -17,9 +15,9 @@ const HomeContent = () => {
   const [isSceneOpen, setIsSceneOpen] = useState(false)
   const [isOptionsOpen, setIsOptionsOpen] = useState(false)
   const [isCanvasOpen, setIsCanvasOpen] = useState(false)
-  const [currentMap, setCurrentMap] = useState('')
+  const [currentEffect, setCurrentEffect] = useState('')
+  const [currentImage, setCurrentImage] = useState('')
   const videoRef = useRef<any>()
-  const videoRef2 = useRef<any>()
   const {windowSize, gameData, userData, tokens, isSheetOpen, setIsSheetOpen, isCardsOpen, setIsCardsOpen, messages, userCurrentToken} = useApp()
   const router = useRouter()
 
@@ -35,10 +33,14 @@ const HomeContent = () => {
     }
 
     if (gameData && userData){
-      if (currentMap !== gameData.map.current) {
-        setCurrentMap(gameData.map.current)
+      const newEffect = gameData.map.effect || ''
+      if (currentEffect !== newEffect) {
+        setCurrentEffect(newEffect)
         if (videoRef.current) videoRef.current.load()
-        if (videoRef2.current) videoRef2.current.load()
+      }
+      const newImage = gameData.map.image || ''
+      if (currentImage !== newImage) {
+        setCurrentImage(newImage)
       }
     }
   },[userData, gameData])
@@ -64,19 +66,18 @@ const HomeContent = () => {
   return (
     <>
       {windowSize && <div id='canvas' style={{position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: isCanvasOpen ? 9999999 : -1}}></div>}
-      {gameData && currentMap && <>
+      {gameData && gameData.map && <>
         <Box width='100%' height='100vh' display='flex' justifyContent='space-between' flexDirection={'row'} alignItems={'flex-start'} overflow={'hidden'}>
           <Box width='calc(100% - 240px)' height='100vh' position='relative' overflow='visible'>
             <Box width='100vw' height='100vh' position='relative' overflow='visible'>
-              {gameData.map && currentMap && <Image src={`/scenes/${currentMap}.webp`} alt='' width={windowSize?.width} height={windowSize?.height} style={{width: '100%', height: '100%', objectFit:'cover', pointerEvents: 'none' }}/>}
-              {gameData.map && gameData.maps[currentMap].effect && renderVideo(`/effects/${gameData.maps[currentMap].effect}.webm`, videoRef)}
-              {gameData.map && gameData.maps[currentMap].night && <Box position='absolute' top={0} left={0} width={windowSize?.width} height={windowSize?.height} bgcolor='rgb(0 14 149 / 86%)' style={{mixBlendMode: 'multiply'}}/>}
+              {currentImage && <img src={currentImage} alt='' width={windowSize?.width} height={windowSize?.height} style={{width: '100%', height: '100%', objectFit:'cover', pointerEvents: 'none' }}/>}
+              {gameData.map.effect && renderVideo(`/effects/${gameData.map.effect}.webm`, videoRef)}
+              {gameData.map.night && <Box position='absolute' top={0} left={0} width={windowSize?.width} height={windowSize?.height} bgcolor='rgb(0 14 149 / 86%)' style={{mixBlendMode: 'multiply'}}/>}
               <Box sx={styles.title}>
                 {gameData.map.doom_enabled && <Box display='flex' gap='5px' justifyContent='center' marginBottom='5px'>
                   {gameData.map.doom.split(',').map((item: string, index: number)=><Typography key={index} color='#FFF' fontSize='1rem' fontWeight='bold' padding='0 5px' style={{backgroundColor: 'rgba(0,0,0,0.4)'}}>{item}</Typography>)}
                 </Box>}
-                {!isSceneOpen && <Typography variant="h1" color='#FFF' component="h1">{gameData.maps[currentMap].title}</Typography>}
-                {!isSceneOpen && <Typography color='#FFF' fontSize={'1.2rem'}>{gameData.maps[currentMap].subtitle}</Typography>}
+                {!isSceneOpen && gameData.map.name && <Typography variant="h1" color='#FFF' component="h1">{gameData.map.name}</Typography>}
               </Box>
               <Box sx={[styles.menu, isSceneOpen ? styles.menuItemBlack : {}]}>
                 {isSceneOpen && 

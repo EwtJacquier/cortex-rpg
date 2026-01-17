@@ -28,6 +28,10 @@ interface AppProps {
   updateCurrentMap?: (map: string, night: boolean) => void;
   updateScene?: (sceneVisible: boolean, night: boolean, nigthScene: boolean) => void,
   updateDoom?: (doomEnabled: boolean, doom: string) => void,
+  updateEffect?: (effect: string) => void,
+  updateMapName?: (name: string) => void,
+  updateNight?: (night: boolean) => void,
+  updateMapImage?: (image: string) => void,
   sendMessage?: (token: any, message: string, dices: any, firstResult: any, secondResult: any, target?: any, damage?: any, shield?: any, bonus?: any, buff?: boolean, item?: boolean, effect?: any, dices2?: any, message2?: string) => void;
   changeCurrentToken?: (token: string) => void,
   isSheetOpen?: boolean,
@@ -460,13 +464,9 @@ export const AppProvider = ({children}: any) => {
 
   const changeTerrain = (index: number, terrain: string) => {
     if (database.current && gameData){
-      let active_scene = gameData.maps[gameData.map.current];
+      let currentTerrain = gameData.map.terrain || '0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0';
 
-      if ( ! active_scene.terrain ) {
-        active_scene.terrain = '0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0';
-      }
-
-      let new_terrain = active_scene.terrain.split(',');
+      let new_terrain = currentTerrain.split(',');
 
       if (parseInt(terrain) == 2) {
         terrain += '|Deslizar';
@@ -488,9 +488,9 @@ export const AppProvider = ({children}: any) => {
 
       new_terrain[index] = terrain;
 
-      active_scene.terrain = new_terrain.join(',');
-
-      update(ref(database.current, 'game/maps/' + gameData.map.current), active_scene);
+      update(ref(database.current, 'game/map'), {
+        terrain: new_terrain.join(',')
+      });
     }
   }
 
@@ -509,6 +509,38 @@ export const AppProvider = ({children}: any) => {
       update(ref(database.current, 'game/map'), {
         doom_enabled: doomEnabled,
         doom: doom,
+      });
+    }
+  }
+
+  const updateEffect = (effect: string) => {
+    if (database.current && userData){
+      update(ref(database.current, 'game/map'), {
+        effect: effect,
+      });
+    }
+  }
+
+  const updateMapName = (name: string) => {
+    if (database.current && userData){
+      update(ref(database.current, 'game/map'), {
+        name: name,
+      });
+    }
+  }
+
+  const updateNight = (night: boolean) => {
+    if (database.current && userData){
+      update(ref(database.current, 'game/map'), {
+        night: night,
+      });
+    }
+  }
+
+  const updateMapImage = (image: string) => {
+    if (database.current && userData){
+      update(ref(database.current, 'game/map'), {
+        image: image,
       });
     }
   }
@@ -572,6 +604,10 @@ export const AppProvider = ({children}: any) => {
     updateCurrentMap,
     updateScene,
     updateDoom,
+    updateEffect,
+    updateMapName,
+    updateNight,
+    updateMapImage,
     sendMessage,
     changeCurrentToken,
     isSheetOpen,

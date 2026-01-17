@@ -997,10 +997,9 @@ const SaBattleGrid = (props: saBattleGridProps) => {
                     '&:not([datadamage="0"])::before': {content: 'attr(datadamage)', whiteSpace: 'nowrap', fontSize: '0.8rem', position: 'absolute', bottom: '0', left: '50%', transform: 'translateX(-50%)', padding: '0.2em', color: '#FFF', textAlign: 'center', backgroundColor: '#000'},
                     '&::after': {content: 'attr(datatile)', fontSize: '1em', position: 'absolute', top: '0', left: '0', padding: '0.2em', color: '#FFF', width: '1em', textAlign: 'center', backgroundColor: '#000', opacity: '0.6'},
                   }
-                  const active_scene = gameData.maps[gameData.map.current];
                   let terrain_damage = 0;
-                  if (active_scene.terrain) {
-                    let terrain = active_scene.terrain.split(',');
+                  if (gameData.map.terrain) {
+                    let terrain = gameData.map.terrain.split(',');
                     
                     const terrain_data = terrain[index].split('|');
                     const terrain_type = parseInt(terrain_data[0]);
