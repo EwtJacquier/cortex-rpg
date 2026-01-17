@@ -32,6 +32,8 @@ const SaMenu = (props: saMenuProps) => {
                       subitem.text = subitem.text.replace('(ação)', '<span class="tag tag-red">A</span>');
                       subitem.text = subitem.text.replace('(suporte)', '<span class="tag tag-blue">S</span>');
                       subitem.text = subitem.text.replace('(reação)', '<span class="tag tag-purple">R</span>');
+                      subitem.text = subitem.text.replace('(cenário)', '<span class="tag tag-purple">C</span>');
+                      subitem.text = subitem.text.replace('(cenario)', '<span class="tag tag-purple">C</span>');
 
                       return (
                         <MenuItem key={index + '_' + subindex} onClick={subitem.action} sx={{'&:hover': {backgroundColor: 'rgba(255,255,255,0.2)'}}}>

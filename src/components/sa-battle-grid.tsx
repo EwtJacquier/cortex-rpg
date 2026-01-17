@@ -223,7 +223,7 @@ const SaBattleGrid = (props: saBattleGridProps) => {
       }
       else {
         phrase = messages[messages.length - 1].message;
-        phrase = phrase.replace('(ação)', '').replace('(suporte)', '').replace('(reação)', '').trim();
+        phrase = phrase.replace('(ação)', '').replace('(suporte)', '').replace('(reação)', '').replace('(cenário)', '').replace('(cenario)', '').trim();
         phrase = phrase.indexOf('\\') > -1 ? phrase.split('\\')[0].split('(')[0].trim() : phrase;
         phrase += '!';
       }
@@ -549,6 +549,11 @@ const SaBattleGrid = (props: saBattleGridProps) => {
       setDices(dados);
 
       setActiveTokenMenu('');
+
+      setTimeout(function(){
+        document.getElementById('roll')?.click()
+      },500)
+      /*
       
       let def = parseInt(tokens[slug].attr?.df)
 
@@ -571,6 +576,7 @@ const SaBattleGrid = (props: saBattleGridProps) => {
       setTimeout(function() {
         setIsTypeboxOpen(true);
       },500);
+      */
     }
 
     const useskill = (slug : string, skill: any) => {
@@ -679,6 +685,10 @@ const SaBattleGrid = (props: saBattleGridProps) => {
         }
       }
       else if ( skill.arma || skill.fixo || skill.dados ) {
+        setTimeout(function(){
+          document.getElementById('roll')?.click()
+        },500)
+        /*
         let def = parseInt(tokens[slug].attr?.df)
 
         let dif_count = 3 + def;
@@ -700,6 +710,7 @@ const SaBattleGrid = (props: saBattleGridProps) => {
         setTimeout(function() {
           setIsTypeboxOpen(true);
         },500);
+        */
       }
       else {
         setSend('');

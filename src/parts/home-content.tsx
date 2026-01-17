@@ -107,6 +107,8 @@ const HomeContent = () => {
                 message = message.replace('(ação)', '<span class="tag tag-red">A</span>');
                 message = message.replace('(suporte)', '<span class="tag tag-blue">S</span>');
                 message = message.replace('(reação)', '<span class="tag tag-purple">R</span>');
+                message = message.replace('(cenário)', '<span class="tag tag-purple">R</span>');
+                message = message.replace('(cenario)', '<span class="tag tag-purple">R</span>');
                 let pieces = message.indexOf('\\') > -1 ? message.split('\\') : [message];
                 let bonus = 0;
                 if (item.bonus && item.shield) {
