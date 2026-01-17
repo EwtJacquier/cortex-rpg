@@ -360,10 +360,6 @@ export const AppProvider = ({children}: any) => {
         data.slug = token;
       }
 
-      if ( ! data.type ) {
-        data.type = 'npc';
-      }
-
       update(ref(database.current, 'tokens/' + token), data);
     }
   }
