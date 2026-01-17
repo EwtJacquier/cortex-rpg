@@ -124,10 +124,16 @@ const FormFicha = (props: FormProps) => {
     {value: '', label: '-'},
     {value: '1d4', label: '1D4'},
     {value: '2d4', label: '2D4'},
+    {value: '3d4', label: '3D4'},
     {value: '1d6', label: '1D6'},
     {value: '2d6', label: '2D6'},
+    {value: '3d6', label: '3D6'},
     {value: '1d8', label: '1D8'},
     {value: '2d8', label: '2D8'},
+    {value: '3d8', label: '3D8'},
+    {value: '1d10', label: '1D10'},
+    {value: '2d10', label: '2D10'},
+    {value: '3d10', label: '3D10'}
   ]
 
   const mv_al_data = [
